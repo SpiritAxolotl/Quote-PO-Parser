@@ -1,2 +1,4 @@
-POs/**
-Quotes/**
+bin/POs/**
+src/POs/**
+bin/Quotes/**
+src/Quotes/**
