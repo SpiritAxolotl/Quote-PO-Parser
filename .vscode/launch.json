@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": "POs_e448f4e6",
+            "stepFilters": {
+                "skipClasses": [
+                    "$JDK",
+                    "$Libraries",
+                    "java.*",
+                    "javax.*",
+                    "jdk.*",
+                    "org.*",
+                    "technology.*",
+                    "com.*",
+                    "jj2000.*"
+                ],
+                "skipSynthetics": true,
+                "skipStaticInitializers": true,
+                "skipConstructors": false
+            }
+        }
+    ]
+}

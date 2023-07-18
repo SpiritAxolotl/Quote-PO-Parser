@@ -1,0 +1,20 @@
+{
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+      "lib/**/*.jar",
+      "c:\\Users\\user-073\\Downloads\\tabula-1.0.5-jar-with-dependencies.jar",
+      "c:\\Users\\gamec\\Downloads\\tabula-1.0.5-jar-with-dependencies.jar"
+    ],
+    "java.debug.settings.stepping.skipClasses": [
+        "$JDK",
+        "$Libraries",
+        "java.*",
+        "javax.*",
+        "jdk.*",
+        "org.*",
+        "technology.*",
+        "com.*",
+        "jj2000.*"
+    ]
+}
