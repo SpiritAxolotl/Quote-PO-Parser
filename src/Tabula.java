@@ -21,20 +21,20 @@ public class Tabula {
     private PO po;
     private Quote quote;
     public PO readTablesPO(File file, Out out) throws Exception {
-        this.readTables(file, out, 0);
+        this.readTables(file, out, 0, "POs\\");
         return this.po;
     }
     public Quote readTablesQuote(File file, Out out, int type) throws Exception {
-        this.readTables(file, out, type);
+        this.readTables(file, out, type, "Quotes\\");
         return this.quote;
     }
-    private void readTables(File file, Out out, int type) throws Exception {
+    private void readTables(File file, Out out, int type, String suff) throws Exception {
         if (file.exists()) {
             out.println("File exists!");
         } else {
             out.println("File doesn't exist :(");
         }
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream("POs\\" + file.getName());
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("inputs\\" + suff + file.getName());
         PrintWriter pw = new PrintWriter("src\\temp.txt");
         //extract tables from document
         try (PDDocument document = PDDocument.load(in)) {
@@ -71,7 +71,7 @@ public class Tabula {
         }
         //all of this is davey's code:
         //Putting the inputs into a table
-        Scanner scan = new Scanner(new File("..\\..\\temp.txt"));
+        Scanner scan = new Scanner(new File("src\\temp.txt"));
         ArrayList<String> lines = new ArrayList<String>();
         while (scan.hasNextLine()) {
             lines.add(scan.nextLine().trim());

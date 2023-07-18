@@ -9,7 +9,7 @@
             "name": "App",
             "request": "launch",
             "mainClass": "App",
-            "projectName": "POs_e448f4e6",
+            "projectName": "Parser_c70a086d",
             "stepFilters": {
                 "skipClasses": [
                     "$JDK",
