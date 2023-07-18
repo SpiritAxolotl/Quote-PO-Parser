@@ -35,7 +35,7 @@ public class Tabula {
             out.println("File doesn't exist :(");
         }
         InputStream in = this.getClass().getClassLoader().getResourceAsStream("POs\\" + file.getName());
-        PrintWriter pw = new PrintWriter("..\\..\\temp.txt");
+        PrintWriter pw = new PrintWriter("src\\temp.txt");
         //extract tables from document
         try (PDDocument document = PDDocument.load(in)) {
             SpreadsheetExtractionAlgorithm sea = new SpreadsheetExtractionAlgorithm();

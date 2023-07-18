@@ -1,4 +1,5 @@
-bin/POs/**
-src/POs/**
-bin/Quotes/**
-src/Quotes/**
+**/POs/**
+**/Quotes/**
+**/inputs/**
+**/outputs/**
+temp.txt
