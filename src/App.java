@@ -61,14 +61,14 @@ public class App {
         for (File quotePDF : quotes) {
             out.println("Current file: " + quotePDF.getName());
             out.println("Filepath: " + quotePDF.getPath() + "\n");
-            if (match("Graybar Quotation_(\\d{10})__(\\d{14})\\.pdf", quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 4));
-            } else if (match("S(\\d{9})-(\\d{4})_(\\d{5})\\.pdf", quotePDF.getName())) {
+             if (match("S(\\d{9})-(\\d{4})_(\\d{5})\\.pdf", quotePDF.getName())) {
                 quoteList.add(t.readTablesQuote(quotePDF, out, 1));
             } else if (match("Quotation REG_(\\d{5})\\.pdf", quotePDF.getName())) {
                 quoteList.add(t.readTablesQuote(quotePDF, out, 2));
             } else if (match("S(\\d{7})-(\\d{4})\\.pdf", quotePDF.getName())) {
                 quoteList.add(t.readTablesQuote(quotePDF, out, 3));
+            } else if (match("Graybar Quotation_(\\d{10})__(\\d{14})\\.pdf", quotePDF.getName())) {
+                quoteList.add(t.readTablesQuote(quotePDF, out, 4));
             } else {
                 out.println("File didn't match.");
             }
@@ -89,9 +89,9 @@ public class App {
         outPOs.close();
         outQuotes.close();
         
-        out.println("Total FileNotFound's: " + numFNF);
+        out.println("Total Files Not Found: " + numFNF);
         out.println("Total Files: " + pos.length);
-        out.println("" + (1.0-(double)numFNF/pos.length)*100);
+        out.println((1.0-(double)numFNF/pos.length)*100 + "% of files were found");
         out.close();
     }
 }
