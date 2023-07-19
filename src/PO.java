@@ -21,8 +21,7 @@ public class PO {
         this.payterms = payterms;
     }
     public PO() {
-        this(-1, new int[3], "", new ArrayList<Order>(), -1, "", "");
-        setDate(-1, -1, -1);
+        this(-1, new int[] {-1,-1,-1}, "", new ArrayList<Order>(), -1, "", "");
     }
 
     public int getID() {

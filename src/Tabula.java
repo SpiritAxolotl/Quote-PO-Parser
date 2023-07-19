@@ -1,4 +1,4 @@
-//code stolen from https://github.com/tabulapdf/tabula-java and modified by Davey
+//code stolen from https://github.com/tabulapdf/tabula-java and HEAVILY modified by Davey
 
 import java.io.File;
 import java.io.InputStream;
@@ -73,6 +73,7 @@ public class Tabula {
         }
         return -1;
     }
+    //mostly written by someone else:
     private void readTables(File file, Out out, int type) throws Exception {
         if (file.exists()) {
             out.println("File exists!");
@@ -133,10 +134,10 @@ public class Tabula {
             po.setDate(lines.get(4));
             po.setVendor(lines.get(7));
             po.setPayTerms(lines.get(3));
-            out.debug("ID - " + po.getID());
-            out.debug("Date - " + po.getDateString());
-            out.debug("Vendor - " + po.getVendor());
-            out.debug("Payment Terms - " + po.getPayTerms());
+            out.debug("         ID - " + po.getID());
+            out.debug("       Date - " + po.getDateString());
+            out.debug("     Vendor - " + po.getVendor());
+            out.debug("  Pay Terms - " + po.getPayTerms());
             po.setMemo(lines.get(po.findSetTotal(lines)-1));
             if (lineSize <= 40) {
                 Order order = new Order(true);
@@ -147,16 +148,16 @@ public class Tabula {
                 order.setAmount(lines.get(33));
                 po.addOrder(order.isValid(out));
                 out.debug("Description - " + order.getDesc());
-                out.debug("Quantity - " + order.getQuantity());
-                out.debug("Rate - " + order.getRate());
-                out.debug("Job - " + order.getJob());
-                out.debug("Amount - " + order.getAmount());
+                out.debug("   Quantity - " + order.getQuantity());
+                out.debug("       Rate - " + order.getRate());
+                out.debug("        Job - " + order.getJob());
+                out.debug("     Amount - " + order.getAmount());
                 if(po.getLastOrder().getDesc().isBlank()){
                     po.removeOrder(po.getOrders().size()-1);
                 }
             } else if (lineSize <= 51) {
                 //findThing(lines, 11);
-                for (int i=findThing(lines,findThing(lines,findThing(lines,11)+1)+6); i<=lineSize-12; i+=6) {
+                for (int i=findThing(lines, new int[] {11,1,6}); i<=lineSize-12; i+=6) {
                     Order order = new Order(true);
                     order.setDesc(lines.get(i));
                     order.setQuantity(lines.get(i+1));
@@ -164,16 +165,16 @@ public class Tabula {
                     order.setJob(lines.get(i+3));
                     order.setAmount(lines.get(i+5));
                     out.debug("Description - " + order.getDesc());
-                    out.debug("Quantity - " + order.getQuantity());
-                    out.debug("Rate - " + order.getRate());
-                    out.debug("Job - " + order.getJob());
-                    out.debug("Amount - " + order.getAmount());
+                    out.debug("   Quantity - " + order.getQuantity());
+                    out.debug("       Rate - " + order.getRate());
+                    out.debug("        Job - " + order.getJob());
+                    out.debug("     Amount - " + order.getAmount());
                     if(!order.getDesc().isBlank()){
                         po.addOrder(order.isValid(out));
                     }
                 }
-                out.debug("Memo - " + po.getMemo());
-                out.debug("Total - $" + po.getTotal());
+                out.debug("       Memo - " + po.getMemo());
+                out.debug("      Total - $" + po.getTotal());
                 /*
                 if(po.getLastOrder().getDesc().isBlank()){
                     po.removeOrder(po.getOrders().size()-1);
@@ -196,16 +197,16 @@ public class Tabula {
                     order.setJob(lines.get(i+6));
                     order.setAmount(lines.get(i+8));
                     out.debug("Description - " + order.getDesc());
-                    out.debug("Quantity - " + order.getQuantity());
-                    out.debug("Rate - " + order.getRate());
-                    out.debug("Job - " + order.getJob());
-                    out.debug("Amount - " + order.getAmount());
+                    out.debug("   Quantity - " + order.getQuantity());
+                    out.debug("       Rate - " + order.getRate());
+                    out.debug("        Job - " + order.getJob());
+                    out.debug("     Amount - " + order.getAmount());
                     if(!order.getDesc().isBlank()){
                         po.addOrder(order.isValid(out));
                     }
                 }
-                out.debug("Memo - " + po.getMemo());
-                out.debug("Total - $" + po.getTotal());
+                out.debug("       Memo - " + po.getMemo());
+                out.debug("      Total - $" + po.getTotal());
             }
             this.po = po.isValid(out);
             break;
