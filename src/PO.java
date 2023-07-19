@@ -221,7 +221,7 @@ public class PO {
     //update: it was obvious when it happened. fixing now...
     public String inputSanitizer(String text) {
         if (text.contains(",")||text.contains("\"")) {
-            text = "\"" + text.replace("\"", "\"\"") + "\"";
+            text = "\"" + text.replaceAll("\"", "\"\"") + "\"";
         }
         return text;
     }
@@ -252,9 +252,9 @@ public class PO {
         }
         return concat;
     }
-    public PO isValid() throws NullPointerException {
+    public PO isValid(Out out) throws NullPointerException {
         if(
-            this.getID() == -1 || 
+            this.getID() == -1 ||
             (this.getDate(0) == -1 || this.getDate(1) == -1 || this.getDate(2) == -1) ||
             this.getVendor().isBlank() ||
             this.getTotal() == -1
@@ -274,6 +274,7 @@ public class PO {
             }
             message = message.substring(0, message.length()-2);
             //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
+            out.close();
             throw new NullPointerException(message);
         }
         return this;

@@ -41,7 +41,7 @@ public class Order {
     }
     public String setDesc(String desc) {
         String oldDesc = this.desc;
-        this.desc = desc.replace("\uFFFD", "-");
+        this.desc = desc.replaceAll("\uFFFD", "-");
         return oldDesc;
     }
     public int getCode() {
@@ -73,12 +73,12 @@ public class Order {
     }
     public int setQuantity(int quantity) {
         int oldQuantity = this.quantity;
-        this.quantity = Integer.parseInt((quantity+"").replace(",",""));
+        this.quantity = quantity;
         return oldQuantity;
     }
     public int setQuantity(String quantity) {
         int oldQuantity = this.quantity;
-        try {this.quantity = Integer.parseInt(quantity);} catch (NullPointerException | NumberFormatException er) {}
+        try {this.quantity = Integer.parseInt(quantity.trim().replaceAll(",",""));} catch (NullPointerException | NumberFormatException er) {}
         return oldQuantity;
     }
     public String setOQuantity(String oquantity) {
@@ -121,5 +121,33 @@ public class Order {
         String cleanAmount = amount.trim().replaceAll(",", "").replaceAll("\"", "");
         try {this.amount = Double.parseDouble(cleanAmount);} catch (NullPointerException | NumberFormatException er) {}
         return oldAmount;
+    }
+    //add another case for the quotes at some point
+    public Order isValid(Out out) throws NullPointerException {
+        if(
+            this.getDesc().isBlank() ||
+            this.getQuantity() == -1 ||
+            this.getRate() == -1.0 ||
+            this.getAmount() == 1.0
+        ) {
+            String message = "Parameters missing: Order ";
+            if (this.getDesc().isBlank()) {
+                message += "Description, ";
+            }
+            if (this.getQuantity() == -1) {
+                message += "Quantity, ";
+            }
+            if (this.getRate() == -1.0) {
+                message += "Rate, ";
+            }
+            if (this.getAmount() == -1.0) {
+                message += "Amount, ";
+            }
+            message = message.substring(0, message.length()-2);
+            //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
+            //out.close();
+            //throw new NullPointerException(message);
+        }
+        return this;
     }
 }

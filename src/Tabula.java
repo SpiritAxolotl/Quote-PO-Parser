@@ -79,7 +79,7 @@ public class Tabula {
                         // print all column-cells of the row plus linefeed
                         for (@SuppressWarnings("rawtypes") RectangularTextContainer content : cells) {
                             // Note: Cell.getText() uses \r to concat text chunks
-                            String text = content.getText().replace("\r", " ");
+                            String text = content.getText().replaceAll("\r", " ");
                             pw.println(text);
                             out.println(i + ": " + text);
                             //poList.add(new PO());
@@ -124,35 +124,69 @@ public class Tabula {
                 order.setRate(lines.get(30));
                 order.setJob(lines.get(31));
                 order.setAmount(lines.get(33));
-                po.addOrder(order);
+                po.addOrder(order.isValid(out));
                 out.debug("Description - " + order.getDesc());
                 out.debug("Quantity - " + order.getQuantity());
                 out.debug("Rate - " + order.getRate());
                 out.debug("Job - " + order.getJob());
                 out.debug("Amount - " + order.getAmount());
-            } else {
-                findThing(lines, 11);
-                for (int i=28; i<=lineSize-12; i+=6) {
+                if(po.getLastOrder().getDesc().isBlank()){
+                    po.removeOrder(po.getOrders().size()-1);
+                }
+            } else if (lineSize <= 51) {
+                //findThing(lines, 11);
+                for (int i=findThing(lines,findThing(lines,findThing(lines,11)+1)+6); i<=lineSize-12; i+=6) {
                     Order order = new Order(true);
                     order.setDesc(lines.get(i));
                     order.setQuantity(lines.get(i+1));
                     order.setRate(lines.get(i+2));
                     order.setJob(lines.get(i+3));
                     order.setAmount(lines.get(i+5));
-                    po.addOrder(order);
                     out.debug("Description - " + order.getDesc());
                     out.debug("Quantity - " + order.getQuantity());
                     out.debug("Rate - " + order.getRate());
                     out.debug("Job - " + order.getJob());
                     out.debug("Amount - " + order.getAmount());
+                    if(!order.getDesc().isBlank()){
+                        po.addOrder(order.isValid(out));
+                    }
                 }
                 out.debug("Memo - " + po.getMemo());
                 out.debug("Total - $" + po.getTotal());
+                /*
                 if(po.getLastOrder().getDesc().isBlank()){
                     po.removeOrder(po.getOrders().size()-1);
                 }
+                */
+            } else {
+                int index = findThing(lines,findThing(lines,findThing(lines,11)+1)+6);
+                Order ordertemp = new Order(true);
+                ordertemp.setDesc(lines.get(index));
+                ordertemp.setQuantity(lines.get(index+1));
+                ordertemp.setRate(lines.get(index+2));
+                ordertemp.setJob(lines.get(index+3));
+                ordertemp.setAmount(lines.get(index+4));
+                po.addOrder(ordertemp.isValid(out));
+                for (int i=index+5; i<=lineSize-12; i+=12) {
+                    Order order = new Order(true);
+                    order.setDesc(lines.get(i));
+                    order.setQuantity(lines.get(i+2));
+                    order.setRate(lines.get(i+4));
+                    order.setJob(lines.get(i+6));
+                    order.setAmount(lines.get(i+8));
+                    out.debug("Description - " + order.getDesc());
+                    out.debug("Quantity - " + order.getQuantity());
+                    out.debug("Rate - " + order.getRate());
+                    out.debug("Job - " + order.getJob());
+                    out.debug("Amount - " + order.getAmount());
+                    if(!order.getDesc().isBlank()){
+                        po.addOrder(order.isValid(out));
+                    }
+                }
+                out.debug("Memo - " + po.getMemo());
+                out.debug("Total - $" + po.getTotal());
             }
-            this.po = po.isValid();
+            this.po = po.isValid(out);
             break;
         //uncomment and modify when I start working on quotes
         /*case 1:
