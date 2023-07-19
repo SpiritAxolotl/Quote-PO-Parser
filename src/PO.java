@@ -140,6 +140,24 @@ public class PO {
         }
         return -1;
     }
+    public int findSetDate(ArrayList<String> strings) {
+        for(int i=11; i<strings.size(); i++) {
+            if (!strings.get(i).isBlank()) {
+                this.setDate(strings.get(i));
+                return i;
+            }
+        }
+        return -1;
+    }
+    public int findDescDate(ArrayList<String> strings) {
+        for(int i=findSetDate(strings)+1; i<strings.size(); i++) {
+            if (!strings.get(i).isBlank()) {
+                //this.setDate(strings.get(i));
+                return i;
+            }
+        }
+        return -1;
+    }
     public double setTotal(String total) {
         String cleanTotal = total.trim().replaceAll(",", "");
         System.out.println(cleanTotal);
@@ -200,9 +218,10 @@ public class PO {
     //it will get f'd up if there are single doublequotes
     //and I pray none of the inputs have them
     //(but if they do it will be obvious when it happens)
+    //update: it was obvious when it happened. fixing now...
     public String inputSanitizer(String text) {
-        if (text.contains(",")) {
-            text = "\"" + text.replace("\"", "\\\"") + "\"";
+        if (text.contains(",")||text.contains("\"")) {
+            text = "\"" + text.replace("\"", "\"\"") + "\"";
         }
         return text;
     }

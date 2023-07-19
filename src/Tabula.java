@@ -21,20 +21,45 @@ public class Tabula {
     private PO po;
     private Quote quote;
     public PO readTablesPO(File file, Out out) throws Exception {
-        this.readTables(file, out, 0, "POs\\");
+        this.readTables(file, out, 0);
         return this.po;
     }
     public Quote readTablesQuote(File file, Out out, int type) throws Exception {
-        this.readTables(file, out, type, "Quotes\\");
+        this.readTables(file, out, type);
         return this.quote;
     }
-    private void readTables(File file, Out out, int type, String suff) throws Exception {
+    public int findThing(ArrayList<String> strings, int index) {
+        for(int i=index; i<strings.size(); i++) {
+            if (!strings.get(i).isBlank()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    public int findSpecificThing(ArrayList<String> strings, String target) {
+        for(int i=0; i<strings.size(); i++) {
+            if (strings.get(i).equals(target)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    public int findSpecificThing(ArrayList<String> strings, String target, int index) {
+        for(int i=index; i<strings.size(); i++) {
+            if (strings.get(i).equals(target)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    private void readTables(File file, Out out, int type) throws Exception {
         if (file.exists()) {
             out.println("File exists!");
         } else {
             out.println("File doesn't exist :(");
         }
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream("inputs\\" + suff + file.getName());
+        //out.debug("inputs\\extracted\\" + file.getParent() + file.getName());
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file.getPath().substring(4));
         PrintWriter pw = new PrintWriter("src\\temp.txt");
         //extract tables from document
         try (PDDocument document = PDDocument.load(in)) {
@@ -106,6 +131,7 @@ public class Tabula {
                 out.debug("Job - " + order.getJob());
                 out.debug("Amount - " + order.getAmount());
             } else {
+                findThing(lines, 11);
                 for (int i=28; i<=lineSize-12; i+=6) {
                     Order order = new Order(true);
                     order.setDesc(lines.get(i));

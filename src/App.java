@@ -7,8 +7,9 @@ import java.util.regex.Matcher;
 
 
 public class App {
-    static File[] pos = (new File("src\\inputs\\POs")).listFiles();
-    static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
+    static File[] dir = (new File("src\\inputs\\extracted\\")).listFiles();
+    //static File[] pos = (new File("src\\inputs\\POs")).listFiles();
+    //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
     static ArrayList<PO> poList = new ArrayList<PO>();
     static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
@@ -40,39 +41,55 @@ public class App {
             matchList.add(scan.nextLine());
         }
         scan.close();
-        int numFNF = 0;
+        /*
+        String match1 = "PO_(\\d{4})_from_Radiance_Solar_LLC_(\\d{5,6})\\.pdf";
+        String match2 = matchList.get(0);
+        out.debug("match1 == match2? " + match1.equals(match2));
+        */
+        //int numFNF = 0;
         Tabula t = new Tabula();
         //iterate through the POs
-        out.println("POs\n");
-        for (File poPDF : pos) {
-            out.println("Current file: " + poPDF.getName());
-            out.println("Filepath: " + poPDF.getPath());
+        //out.println("POs\n");
+        for (File folder : dir) {
+        for (File aPDF : folder.listFiles()) {
+            out.println("Current file: " + aPDF.getName());
+            out.println("Filepath: " + aPDF.getPath());
             //out.println("Matches \"" + matchList.get(0) + "\"?");
-            if (match("PO_(\\d{4})_from_Radiance_Solar_LLC_(\\d{5,6})\\.pdf", poPDF.getName())) {
+            if (match(matchList.get(0), aPDF.getName())) {
                 out.println("Matches!\n");
-                poList.add(t.readTablesPO(poPDF, out));
+                poList.add(t.readTablesPO(aPDF, out));
+            } else if (match(matchList.get(1), aPDF.getName())) {
+                quoteList.add(t.readTablesQuote(aPDF, out, 1));
+            } else if (match(matchList.get(2), aPDF.getName())) {
+                quoteList.add(t.readTablesQuote(aPDF, out, 2));
+            } else if (match(matchList.get(3), aPDF.getName())) {
+                quoteList.add(t.readTablesQuote(aPDF, out, 3));
+            } else if (match(matchList.get(4), aPDF.getName())) {
+                quoteList.add(t.readTablesQuote(aPDF, out, 4));
             } else {
                 out.println("File didn't match.\n");
-                numFNF++;
+                //numFNF++;
             }
-        }
+        }}
         //iterate through the Quotes
-        out.println("Quotes\n");
+        //out.println("Quotes\n");
+        /*
         for (File quotePDF : quotes) {
             out.println("Current file: " + quotePDF.getName());
             out.println("Filepath: " + quotePDF.getPath() + "\n");
-             if (match("S(\\d{9})-(\\d{4})_(\\d{5})\\.pdf", quotePDF.getName())) {
+                   if (match(matchList.get(1), quotePDF.getName())) {
                 quoteList.add(t.readTablesQuote(quotePDF, out, 1));
-            } else if (match("Quotation REG_(\\d{5})\\.pdf", quotePDF.getName())) {
+            } else if (match(matchList.get(2), quotePDF.getName())) {
                 quoteList.add(t.readTablesQuote(quotePDF, out, 2));
-            } else if (match("S(\\d{7})-(\\d{4})\\.pdf", quotePDF.getName())) {
+            } else if (match(matchList.get(3), quotePDF.getName())) {
                 quoteList.add(t.readTablesQuote(quotePDF, out, 3));
-            } else if (match("Graybar Quotation_(\\d{10})__(\\d{14})\\.pdf", quotePDF.getName())) {
+            } else if (match(matchList.get(4), quotePDF.getName())) {
                 quoteList.add(t.readTablesQuote(quotePDF, out, 4));
             } else {
                 out.println("File didn't match.");
             }
         }
+        */
         /* why do I have this section:
         PO[] everything = new PO[poList.size()];
         for (int i=0; i<poList.size(); i++) {
@@ -89,9 +106,9 @@ public class App {
         outPOs.close();
         outQuotes.close();
         
-        out.println("Total Files Not Found: " + numFNF);
-        out.println("Total Files: " + pos.length);
-        out.println((1.0-(double)numFNF/pos.length)*100 + "% of files were found");
+        //out.println("Total Files Not Found: " + numFNF);
+        //out.println("Total Files: " + pos.length);
+        //out.println((1.0-(double)numFNF/pos.length)*100 + "% of files were found");
         out.close();
     }
 }

@@ -73,7 +73,7 @@ public class Order {
     }
     public int setQuantity(int quantity) {
         int oldQuantity = this.quantity;
-        this.quantity = quantity;
+        this.quantity = Integer.parseInt((quantity+"").replace(",",""));
         return oldQuantity;
     }
     public int setQuantity(String quantity) {
