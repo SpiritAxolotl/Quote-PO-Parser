@@ -124,7 +124,7 @@ public class Order {
     }
     //add another case for the quotes at some point
     public Order isValid(Out out) throws NullPointerException {
-        if(
+        if (
             this.getDesc().isBlank() ||
             this.getQuantity() == -1 ||
             this.getRate() == -1.0 ||

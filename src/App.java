@@ -18,13 +18,6 @@ public class App {
         Matcher m = p.matcher(match);
         return m.matches();
     }
-    public static String[] arraylistToArray(ArrayList<String> strings) {
-        String[] strs = new String[strings.size()];
-        for (int i=0; i<strings.size(); i++) {
-            strs[i] = strings.get(i);
-        }
-        return strs;
-    }
     //PO ID, date, vendor, orders(desc, quantity, rate, job, amount), total, tracker
     //reminder: comment how everything works later.
 
@@ -50,8 +43,7 @@ public class App {
         Tabula t = new Tabula();
         //iterate through the POs
         //out.println("POs\n");
-        for (File folder : dir) {
-        for (File aPDF : folder.listFiles()) {
+        for (File folder : dir) {for (File aPDF : folder.listFiles()) {
             out.println("Current file: " + aPDF.getName());
             out.println("Filepath: " + aPDF.getPath());
             //out.println("Matches \"" + matchList.get(0) + "\"?");

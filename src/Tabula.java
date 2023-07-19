@@ -28,6 +28,20 @@ public class Tabula {
         this.readTables(file, out, type);
         return this.quote;
     }
+    public static int[] intArrayListToArray(ArrayList<Integer> ints) {
+        int[] integers = new int[ints.size()];
+        for (int i=0; i<ints.size(); i++) {
+            integers[i] = ints.get(i);
+        }
+        return integers;
+    }
+    public static ArrayList<Integer> intArrayToArrayList(int[] ints) {
+        ArrayList<Integer> integers = new ArrayList<Integer>();
+        for (int i : ints) {
+            integers.add(i);
+        }
+        return integers;
+    }
     public int findThing(ArrayList<String> strings, int index) {
         for(int i=index; i<strings.size(); i++) {
             if (!strings.get(i).isBlank()) {
@@ -35,6 +49,13 @@ public class Tabula {
             }
         }
         return -1;
+    }
+    public int findThing(ArrayList<String> strings, int[] indexes) {
+        int index = 0;
+        for(int i=0; i<indexes.length; i++) {
+            index = findThing(strings, index + indexes[i]);
+        }
+        return index;
     }
     public int findSpecificThing(ArrayList<String> strings, String target) {
         for(int i=0; i<strings.size(); i++) {
@@ -167,7 +188,7 @@ public class Tabula {
                 ordertemp.setJob(lines.get(index+3));
                 ordertemp.setAmount(lines.get(index+4));
                 po.addOrder(ordertemp.isValid(out));
-                for (int i=index+5; i<=lineSize-12; i+=12) {
+                for (int i=index+5; i<=lineSize-24; i+=12) {
                     Order order = new Order(true);
                     order.setDesc(lines.get(i));
                     order.setQuantity(lines.get(i+2));
