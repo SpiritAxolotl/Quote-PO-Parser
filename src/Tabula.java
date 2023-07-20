@@ -77,11 +77,11 @@ public class Tabula {
     private void readTables(File file, Out out, int type) throws Exception {
         if (file.exists()) {
             out.println("File exists!");
+            //out.println("Debug: " + file.getPath().substring(file.getPath().indexOf("\\")+1));
         } else {
             out.println("File doesn't exist :(");
         }
-        //out.debug("inputs\\extracted\\" + file.getParent() + file.getName());
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file.getPath().substring(4));
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file.getPath().substring(file.getPath().indexOf("\\")+1));
         PrintWriter pw = new PrintWriter("src\\temp.txt");
         //extract tables from document
         try (PDDocument document = PDDocument.load(in)) {
@@ -154,10 +154,11 @@ public class Tabula {
                 out.debug("     Amount - " + order.getAmount());
                 if(po.getLastOrder().getDesc().isBlank()){
                     po.removeOrder(po.getOrders().size()-1);
+                    out.debug("Removing that last one");
                 }
             } else if (lineSize <= 51) {
                 //findThing(lines, 11);
-                for (int i=findThing(lines, new int[] {11,1,6}); i<=lineSize-12; i+=6) {
+                for (int i=findThing(lines, new int[] {11,1,6})+1; i<=lineSize-12; i+=6) {
                     Order order = new Order(true);
                     order.setDesc(lines.get(i));
                     order.setQuantity(lines.get(i+1));
