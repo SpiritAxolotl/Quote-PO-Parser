@@ -38,7 +38,7 @@ public class App {
         }
         scan.close();
         
-        //Tabula t = new Tabula();
+        Tabula t = new Tabula();
         WSL wsl = new WSL();
         //iterate through the POs
         for (File folder : dir) {for (File aPDF : folder.listFiles()) {
@@ -46,7 +46,7 @@ public class App {
             out.println("Filepath: " + aPDF.getPath());
             if (match(matchList.get(0), aPDF.getName())) {
                 out.println("Matches!\n");
-                poList.add(wsl.pdfToTextPO(aPDF, out, 0));
+                poList.add(t.readTablesPO(aPDF, out));
             } else if (match(matchList.get(1), aPDF.getName())) {
                 quoteList.add(wsl.pdfToTextQuote(aPDF, out, 1));
             } else if (match(matchList.get(2), aPDF.getName())) {

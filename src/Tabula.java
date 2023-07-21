@@ -14,7 +14,6 @@ import technology.tabula.Page;
 import technology.tabula.PageIterator;
 import technology.tabula.RectangularTextContainer;
 import technology.tabula.Table;
-import technology.tabula.TextElement;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 //Vendor name, quote date, vendor quote number, our reference, product code, product description, quantity, unit price, total price per line.
@@ -108,15 +107,6 @@ public class Tabula {
                             i++;
                         }
                         //out.println();
-                    }
-                    for (List<TextElement> row : table.getRows()) {
-                        for (TextElement element : row) {
-                            String text = element.getText();
-                            double x = element.getX();
-                            double y = element.getY();
-                            
-                            out.println("Text: " + text + ", X: " + x + ", Y: " + y);
-                        }
                     }
                 }
             }
