@@ -1,4 +1,7 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -34,73 +37,61 @@ public class App {
             matchList.add(scan.nextLine());
         }
         scan.close();
-        /*
-        String match1 = "PO_(\\d{4})_from_Radiance_Solar_LLC_(\\d{5,6})\\.pdf";
-        String match2 = matchList.get(0);
-        out.debug("match1 == match2? " + match1.equals(match2));
-        */
-        //int numFNF = 0;
-        Tabula t = new Tabula();
+        
+        //Tabula t = new Tabula();
+        WSL wsl = new WSL();
         //iterate through the POs
-        //out.println("POs\n");
         for (File folder : dir) {for (File aPDF : folder.listFiles()) {
             out.println("Current file: " + aPDF.getName());
             out.println("Filepath: " + aPDF.getPath());
-            //out.println("Matches \"" + matchList.get(0) + "\"?");
             if (match(matchList.get(0), aPDF.getName())) {
                 out.println("Matches!\n");
-                poList.add(t.readTablesPO(aPDF, out));
+                poList.add(wsl.pdfToTextPO(aPDF, out, 0));
             } else if (match(matchList.get(1), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 1));
+                quoteList.add(wsl.pdfToTextQuote(aPDF, out, 1));
             } else if (match(matchList.get(2), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 2));
+                quoteList.add(wsl.pdfToTextQuote(aPDF, out,2));
             } else if (match(matchList.get(3), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 3));
+                quoteList.add(wsl.pdfToTextQuote(aPDF, out, 3));
             } else if (match(matchList.get(4), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 4));
+                quoteList.add(wsl.pdfToTextQuote(aPDF, out, 4));
             } else {
                 out.println("File didn't match.\n");
-                //numFNF++;
             }
         }}
-        //iterate through the Quotes
-        //out.println("Quotes\n");
-        /*
-        for (File quotePDF : quotes) {
-            out.println("Current file: " + quotePDF.getName());
-            out.println("Filepath: " + quotePDF.getPath() + "\n");
-                   if (match(matchList.get(1), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 1));
-            } else if (match(matchList.get(2), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 2));
-            } else if (match(matchList.get(3), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 3));
-            } else if (match(matchList.get(4), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 4));
-            } else {
-                out.println("File didn't match.");
-            }
-        }
-        */
-        /* why do I have this section:
-        PO[] everything = new PO[poList.size()];
-        for (int i=0; i<poList.size(); i++) {
-            everything[i] = poList.get(i);
-        }
-        */
         for (PO p : poList) {
             outPOs.println(p.toCSV());
         }
-        /*
-        for (Quote q : quoteList) {
-            outQuotes.println(q.toCSV());
-        }*/
+
         outPOs.close();
         outQuotes.close();
-        
-        //out.println("Total Files Not Found: " + numFNF);
-        //out.println("Total Files: " + pos.length);
-        //out.println((1.0-(double)numFNF/pos.length)*100 + "% of files were found");
+
+        try {
+            // Define the WSL command to run
+            String wslCommand = "wsl ls -l"; // Replace 'ls -l' with your desired Linux command
+            
+            // Create a ProcessBuilder with the WSL command
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", wslCommand);
+            
+            // Redirect error stream to the same as the output stream
+            processBuilder.redirectErrorStream(true);
+            
+            // Start the process
+            Process process = processBuilder.start();
+            
+            // Read the output of the process
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            
+            // Wait for the process to complete
+            int exitCode = process.waitFor();
+            System.out.println("Exit Code: " + exitCode);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
         out.close();
     }
 }
