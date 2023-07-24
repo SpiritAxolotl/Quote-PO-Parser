@@ -176,7 +176,7 @@ public class PO {
     }
     public double setTotal(String total) {
         String cleanTotal = total.trim().replaceAll(",", "");
-        System.out.println(cleanTotal);
+        //System.out.println(cleanTotal);
         //System.out.println(cleanTotal.substring(cleanTotal.indexOf("$")+2,cleanTotal.length()-1));
         double oldTotal = this.total;
         this.total = Double.parseDouble(cleanTotal.substring(cleanTotal.indexOf("$")+1,cleanTotal.length()-1));

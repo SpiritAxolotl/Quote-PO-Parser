@@ -224,8 +224,8 @@ public class Quote {
             }
             message = message.substring(0, message.length()-2);
             //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
-            out.close();
-            throw new NullPointerException(message);
+            //out.close();
+            //throw new NullPointerException(message);
         }
         return this;
     }

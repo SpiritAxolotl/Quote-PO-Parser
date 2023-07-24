@@ -43,9 +43,9 @@ public class Tabula {
     public int findThing(ArrayList<String> strings, int[] indexes) {
         int index = 0;
         for(int i=0; i<indexes.length; i++) {
-            index = findThing(strings, index + indexes[i]);
+            index = findThing(strings, index + indexes[i]) + 1;
         }
-        return index;
+        return index - 1;
     }
     public int findSpecificThing(ArrayList<String> strings, String target) {
         for(int i=0; i<strings.size(); i++) {
@@ -143,9 +143,10 @@ public class Tabula {
                 po.removeOrder(po.getOrders().size()-1);
                 out.debug("Removing that last one");
             }
-        } else if (lineSize <= 51) {
-            //findThing(lines, 11);
-            for (int i=findThing(lines, new int[] {11,1,6})+1; i<=lineSize-12; i+=6) {
+            out.debug("       Memo - " + po.getMemo());
+            out.debug("      Total - $" + po.getTotal());
+        } else if (lineSize <= 88) {
+            for (int i=findThing(lines, new int[] {11,1,6})-1; i<=lineSize-12; i+=6) {
                 Order order = new Order(true);
                 order.setDesc(lines.get(i));
                 order.setQuantity(lines.get(i+1));
@@ -169,21 +170,32 @@ public class Tabula {
             }
             */
         } else {
-            int index = findThing(lines,findThing(lines,findThing(lines,11)+1)+6);
-            Order ordertemp = new Order(true);
-            ordertemp.setDesc(lines.get(index));
-            ordertemp.setQuantity(lines.get(index+1));
-            ordertemp.setRate(lines.get(index+2));
-            ordertemp.setJob(lines.get(index+3));
-            ordertemp.setAmount(lines.get(index+4));
-            po.addOrder(ordertemp.isValid(out));
-            for (int i=index+5; i<=lineSize-24; i+=12) {
+            /*int test = 0;
+            System.out.println(test + " | 0 expected");
+            System.out.println((test++) + " | 0 expected");
+            System.out.println((test+=2) + " | 1 expected");
+            System.out.println((test) + " | 3 expected");
+            test+=2;*/
+            int index = findThing(lines, new int[] {11,1,6});
+            boolean toggle = true;
+            for (int i=index; i<=lineSize-24; i=findThing(lines, i)) {
                 Order order = new Order(true);
-                order.setDesc(lines.get(i));
-                order.setQuantity(lines.get(i+2));
-                order.setRate(lines.get(i+4));
-                order.setJob(lines.get(i+6));
-                order.setAmount(lines.get(i+8));
+                if (toggle) {
+                    order.setDesc(lines.get(i++));
+                    order.setQuantity(lines.get(i++));
+                    order.setRate(lines.get(i++));
+                    order.setJob(lines.get(i++));
+                    i++;
+                    order.setAmount(lines.get(i++));
+                } else {
+                    order.setDesc(lines.get(i));
+                    order.setQuantity(lines.get(i+=2));
+                    order.setRate(lines.get(i+=2));
+                    order.setJob(lines.get(i+=2));
+                    order.setAmount(lines.get(i+=4));
+                    i++;
+                }
+                toggle = !toggle;
                 out.debug("Description - " + order.getDesc());
                 out.debug("   Quantity - " + order.getQuantity());
                 out.debug("       Rate - " + order.getRate());
