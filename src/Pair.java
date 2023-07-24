@@ -22,7 +22,8 @@ public class Pair {
     }
     public Quote getQuote(int num){
         return this.quotes.get(num);
-    }public Quote getLastQuote(){
+    }
+    public Quote getLastQuote(){
         return this.quotes.get(this.quotes.size()-1);
     }
     public ArrayList<Quote> getQuotes(){

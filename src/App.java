@@ -72,18 +72,26 @@ public class App {
                 out.println("Current file: " + aPDF.getName());
                 out.println("Filepath: " + aPDF.getPath());
                 if (match(matchList.get(0), aPDF.getName())) {
-                    out.println("Matches!\n");
+                    //out.println("Matches!\n");
                     po = t.readTables(aPDF, out);
-                } else if (match(matchList.get(1), aPDF.getName())) {
-                    quotes.add(wsl.readTables(aPDF, out, 0));
-                } else if (match(matchList.get(2), aPDF.getName())) {
-                    quotes.add(wsl.readTables(aPDF, out, 1));
-                } else if (match(matchList.get(3), aPDF.getName())) {
-                    quotes.add(wsl.readTables(aPDF, out, 2));
-                } else if (match(matchList.get(4), aPDF.getName())) {
-                    quotes.add(wsl.readTables(aPDF, out, 3));
+                    poMap.put(po.getID(), po);
                 } else {
-                    out.println("File didn't match.\n");
+                    boolean a = true;
+                    if (match(matchList.get(1), aPDF.getName())) {
+                        quotes.add(wsl.readTables(aPDF, out, 0));
+                    } else if (match(matchList.get(2), aPDF.getName())) {
+                        quotes.add(wsl.readTables(aPDF, out, 1));
+                    } else if (match(matchList.get(3), aPDF.getName())) {
+                        quotes.add(wsl.readTables(aPDF, out, 2));
+                    } else if (match(matchList.get(4), aPDF.getName())) {
+                        quotes.add(wsl.readTables(aPDF, out, 3));
+                    } else {
+                        out.println("File didn't match.\n");
+                        a = false;
+                    }
+                    if (a) {
+                        quoteMap.put(quotes.get(quotes.size()-1).getID(), quotes.get(quotes.size()-1));
+                    }
                 }
             }
             try {
