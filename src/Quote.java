@@ -195,7 +195,6 @@ public class Quote {
         concat += all[all.length-1];
         return concat;
     }
-    // TODO: finish this
     public String toCSV() {
         Stuff s = new Stuff();
         String concat = "";
@@ -208,7 +207,7 @@ public class Quote {
                 this.getVendor(),
                 o.getQuantity()+o.getQtyUnit(),
                 o.getDesc(),
-                o.getRate()+o.getRateUnit(),
+                o.getRate() + "/" + o.getRateUnit(),
                 "\"" + s.formatDoubleWithCommas(o.getAmount()) + "\"",
                 "\"$" + s.formatDoubleWithCommas(this.getTotal()) + "\"",
                 isBeginning
