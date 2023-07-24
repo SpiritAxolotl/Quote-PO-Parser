@@ -1,7 +1,4 @@
 import java.util.ArrayList;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class Quote {
     private int id; //quote number
