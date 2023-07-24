@@ -130,7 +130,6 @@ public class Order {
         return oldAmount;
     }
     //add another case for the quotes at some point
-    //TODO: quotify this with a bool
     public Order isValid(Out out) throws NullPointerException {
         if (this.type) {
             if (
