@@ -6,17 +6,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class WSL {
-    private PO po;
-    private Quote quote;
-    public PO pdfToTextPO(File file, Out out, int type) throws Exception {
-        this.wslSession(file, out, type);
-        return this.po;
-    }
-    public Quote pdfToTextQuote(File file, Out out, int type) throws Exception {
-        this.wslSession(file, out, type);
-        return this.quote;
-    }
-    public void wslSession(File file, Out out, int type) throws Exception {
+    public Quote readTables(File file, Out out, int type) throws Exception {
+        Quote quote = new Quote();
         try {
             // Define the WSL command to run
             String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"src/temp.txt\"";
@@ -53,5 +44,6 @@ public class WSL {
             k++;
         }
         scan.close();
+        return quote.isValid(out);
     }
 }

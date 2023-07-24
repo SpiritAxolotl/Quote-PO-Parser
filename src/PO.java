@@ -110,6 +110,16 @@ public class PO {
     public void addOrder(Order order, int num) {
         this.orders.add(num, order);
     }
+    public void addOrders(Order[] orders) {
+        for(Order order : orders) {
+            this.orders.add(order);
+        }
+    }
+    public void addOrders(Order[] orders, int num) {
+        for(int i=orders.length; i>=0; i--) {
+            this.orders.add(num, orders[i]);
+        }
+    }
     public Order setOrder(int num, Order order) {
         return this.orders.set(num, order);
     }
@@ -264,7 +274,7 @@ public class PO {
             (this.getDate(0) == -1 || this.getDate(1) == -1 || this.getDate(2) == -1) ||
             this.getVendor().isBlank() ||
             this.getTotal() == -1
-        ) {
+        ){
             String message = "Parameters missing: ";
             if (this.getID() == -1) {
                 message += "PO ID, ";
