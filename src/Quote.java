@@ -177,6 +177,7 @@ public class Quote {
         concat += all[all.length-1];
         return concat;
     }
+    // TODO: finish this
     public String toCSV() {
         String concat = "";
         boolean isBeginning = true;
@@ -186,12 +187,8 @@ public class Quote {
                 this.getDateString(),
                 this.getVendor(),
                 o.getDesc(),
-                o.getCode(),
-                o.getOQuantity(),
-                o.getPrice(),
                 "\"" + this.formatDoubleWithCommas(o.getAmount()) + "\"",
                 "\"$" + this.formatDoubleWithCommas(this.getTotal()) + "\"",
-                this.getRef(),
                 isBeginning
             };
             if (isBeginning) {isBeginning = false; concat += this.csvCommas(obj);} else concat += "\n" + this.csvCommas(obj);
@@ -224,6 +221,7 @@ public class Quote {
             }
             message = message.substring(0, message.length()-2);
             //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
+            out.println(message);
             //out.close();
             //throw new NullPointerException(message);
         }

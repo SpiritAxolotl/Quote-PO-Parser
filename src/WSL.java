@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class WSL {
     public Quote readTables(File file, Out out, int type) throws Exception {
-        Stuff s = new Stuff();
+        @SuppressWarnings("unused") Stuff s = new Stuff();
         try {
             // Define the WSL command to run
             String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"src/temp.txt\"";

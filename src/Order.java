@@ -3,12 +3,11 @@ public class Order {
     private boolean type;
     private String desc;
     private int quantity;
-    private double rate;
+    private String qtyunit; //quote exclusive
+    private double rate; //gonna act as unit price too
+    private String rateunit; //quote exclusive
     private String job;
-    private double amount;
-    private int code;
-    private String oquantity;
-    private String price;
+    private double amount; //gonna act as ext price too
     public Order(String desc, int quantity, double rate, String job, double amount) {
         this.desc = desc;
         this.quantity = quantity;
@@ -16,24 +15,25 @@ public class Order {
         this.job = job;
         this.amount = amount;
     }
-    public Order(int code, String desc, String oquantity, String price) {
-        this.code = code;
+    public Order(int quantity, String qtyunit, String desc, double rate, String rateunit, double amount) {
+        this.quantity = quantity;
+        this.qtyunit = qtyunit;
         this.desc = desc;
-        this.oquantity = oquantity;
-        this.price = price;
+        this.rate = rate;
+        this.rateunit = rateunit;
+        this.amount = amount;
     }
     public Order(boolean type) {
         this.type = type;
+        this.quantity = -1;
+        this.rate = -1.0;
         this.desc = "";
+        this.amount = -1.0;
         if (this.type) {
-            this.quantity = -1;
-            this.rate = -1.0;
             this.job = "";
-            this.amount = -1.0;
         } else {
-            this.code = -1;
-            this.oquantity = "";
-            this.price = "";
+            this.qtyunit = "";
+            this.rateunit = "";
         }
     }
     public String getDesc() {
@@ -44,32 +44,11 @@ public class Order {
         this.desc = desc.replaceAll("\uFFFD", "-");
         return oldDesc;
     }
-    public int getCode() {
-        return this.code;
-    }
-    public String setCode(int code) {
-        String oldCode = this.desc;
-        this.code = code;
-        return oldCode;
-    }
-    public int setCode(String code) {
-        int oldCode = this.code;
-        try {this.code = Integer.parseInt(code);} catch (NullPointerException | NumberFormatException er) {}
-        return oldCode;
-    }
-    public String getPrice() {
-        return this.price;
-    }
-    public String setPrice(String price) {
-        String oldPrice = this.price;
-        this.price = price;
-        return oldPrice;
-    }
     public int getQuantity() {
         return this.quantity;
     }
-    public String getOQuantity() {
-        return this.oquantity;
+    public String getQtyUnit() {
+        return this.qtyunit;
     }
     public int setQuantity(int quantity) {
         int oldQuantity = this.quantity;
@@ -78,16 +57,34 @@ public class Order {
     }
     public int setQuantity(String quantity) {
         int oldQuantity = this.quantity;
-        try {this.quantity = Integer.parseInt(quantity.trim().replaceAll(",",""));} catch (NullPointerException | NumberFormatException er) {}
+        String cleanQty = quantity.strip().replaceAll(",","");
+        if (this.type) {
+            try {
+                this.quantity = Integer.parseInt(cleanQty);
+            } catch (NullPointerException | NumberFormatException er) {}
+        } else {
+            int i = 1;
+            try {
+                for (; i<quantity.length(); i++) {
+                    this.quantity = Integer.parseInt(cleanQty.substring(0,i));
+                }
+            } catch (NullPointerException | NumberFormatException er) {
+                this.quantity = Integer.parseInt(cleanQty.substring(0,i));
+                this.qtyunit = cleanQty.substring(i);
+            }
+        }
         return oldQuantity;
     }
-    public String setOQuantity(String oquantity) {
-        String oldOQuantity = this.oquantity;
-        this.oquantity = oquantity;
-        return oldOQuantity;
+    public String setQtyUnit(String qtyunit) {
+        String oldQtyUnit = this.qtyunit;
+        this.qtyunit = qtyunit;
+        return oldQtyUnit;
     }
     public double getRate() {
         return this.rate;
+    }
+    public String getRateUnit() {
+        return this.rateunit;
     }
     public double setRate(double rate) {
         double oldRate = this.rate;
@@ -96,9 +93,22 @@ public class Order {
     }
     public double setRate(String rate) {
         double oldRate = this.rate;
-        String cleanRate = rate.trim().replaceAll(",", "").replaceAll("\"", "");
-        try {this.rate = Double.parseDouble(cleanRate);} catch (NullPointerException | NumberFormatException er) {}
+        String cleanRate = rate.strip().replaceAll(",", "").replaceAll("\"", "");
+        try {
+            if (this.type) {
+                this.rate = Double.parseDouble(cleanRate);
+            } else {
+                String[] split = cleanRate.split("\\/");
+                this.rate = Double.parseDouble(split[0]);
+                this.rateunit = split[1];
+            }
+        } catch (NullPointerException | NumberFormatException er) {}
         return oldRate;
+    }
+    public String setRateUnit(String rateunit) {
+        String oldRateUnit = this.rateunit;
+        this.rateunit = rateunit;
+        return oldRateUnit;
     }
     public String getJob() {
         return this.job;
@@ -123,30 +133,67 @@ public class Order {
         return oldAmount;
     }
     //add another case for the quotes at some point
+    //TODO: quotify this with a bool
     public Order isValid(Out out) throws NullPointerException {
-        if (
-            this.getDesc().isBlank() ||
-            this.getQuantity() == -1 ||
-            this.getRate() == -1.0 ||
-            this.getAmount() == 1.0
-        ) {
-            String message = "Parameters missing: Order ";
-            if (this.getDesc().isBlank()) {
-                message += "Description, ";
+        if (this.type) {
+            if (
+                this.getDesc().isBlank() ||
+                this.getQuantity() == -1 ||
+                this.getRate() == -1.0 ||
+                this.getAmount() == -1.0
+            ) {
+                String message = "Parameters missing: Order ";
+                if (this.getDesc().isBlank()) {
+                    message += "Description, ";
+                }
+                if (this.getQuantity() == -1) {
+                    message += "Quantity, ";
+                }
+                if (this.getRate() == -1.0) {
+                    message += "Rate, ";
+                }
+                if (this.getAmount() == -1.0) {
+                    message += "Amount, ";
+                }
+                message = message.substring(0, message.length()-2);
+                //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
+                //out.close();
+                //throw new NullPointerException(message);
             }
-            if (this.getQuantity() == -1) {
-                message += "Quantity, ";
+        } else {
+            if (
+                this.getDesc().isBlank() ||
+                this.getQuantity() == -1 ||
+                this.getQtyUnit().isBlank() ||
+                this.getRate() == -1.0 ||
+                this.getRateUnit().isBlank() ||
+                this.getAmount() == -1.0
+            ) {
+                String message = "Parameters missing: Order ";
+                if (this.getDesc().isBlank()) {
+                    message += "Description, ";
+                }
+                if (this.getQuantity() == -1) {
+                    message += "Quantity, ";
+                }
+                if (this.getQtyUnit().isBlank()) {
+                    message += "Quantity Unit, ";
+                }
+                if (this.getRate() == -1.0) {
+                    message += "Rate, ";
+                }
+                if (this.getRateUnit().isBlank()) {
+                    message += "Rate Unit, ";
+                }
+                if (this.getAmount() == -1.0) {
+                    message += "Amount, ";
+                }
+                message = message.substring(0, message.length()-2);
+                //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
+                out.println(message);
+                //out.close();
+                //throw new NullPointerException(message);
             }
-            if (this.getRate() == -1.0) {
-                message += "Rate, ";
-            }
-            if (this.getAmount() == -1.0) {
-                message += "Amount, ";
-            }
-            message = message.substring(0, message.length()-2);
-            //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
-            //out.close();
-            //throw new NullPointerException(message);
         }
         return this;
     }
