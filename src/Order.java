@@ -8,7 +8,7 @@ public class Order {
     private String rateunit; //quote exclusive
     private String job;
     private double amount; //gonna act as ext price too
-    public Order(String desc, int quantity, double rate, String job, double amount) {
+    /*public Order(String desc, int quantity, double rate, String job, double amount) {
         this.desc = desc;
         this.quantity = quantity;
         this.rate = rate;
@@ -22,19 +22,16 @@ public class Order {
         this.rate = rate;
         this.rateunit = rateunit;
         this.amount = amount;
-    }
+    }*/
     public Order(boolean type) {
         this.type = type;
         this.quantity = -1;
         this.rate = -1.0;
         this.desc = "";
         this.amount = -1.0;
-        if (this.type) {
-            this.job = "";
-        } else {
-            this.qtyunit = "";
-            this.rateunit = "";
-        }
+        this.job = "";
+        this.qtyunit = "";
+        this.rateunit = "";
     }
     public String getDesc() {
         return this.desc;

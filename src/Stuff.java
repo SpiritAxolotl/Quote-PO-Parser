@@ -1,4 +1,7 @@
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Stuff {
     public static int[] intArrayListToArray(ArrayList<Integer> ints) {
@@ -45,5 +48,22 @@ public class Stuff {
             }
         }
         return -1;
+    }
+    public String intToString(double num) {
+        if (num < 0) {
+            return "";
+        }
+        return "" + num;
+    }
+    public String formatDoubleWithCommas(double number) {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+        DecimalFormat decimalFormat = (DecimalFormat) numberFormat;
+        decimalFormat.applyPattern("#,##0.00");
+        return decimalFormat.format(number);
+    }
+    
+    public String doubleToString(double number) {
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+        return decimalFormat.format(number);
     }
 }
