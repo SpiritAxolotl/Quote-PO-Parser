@@ -44,20 +44,18 @@ public class WSL {
             k++;
         }
         scan.close();
-        int lineSize = lines.size();
+        @SuppressWarnings("unused") int lineSize = lines.size();
         //Parsing the stuff in the java table
         Quote quote = new Quote();
-        quote.setID(lines.get(5));
+        /*quote.setID(lines.get(5));
         quote.setDate(lines.get(4));
         quote.setVendor(lines.get(7));
-        //quote.setPayTerms(lines.get(3));
-        out.debug("         ID - " + quote.getID());
-        out.debug("       Date - " + quote.getDateString());
+        out.debug("  Quote Num - " + quote.getID());
+        out.debug("CustomerNum - " + quote.getID());
+        out.debug("  Ship Date - " + quote.getDateString());
         out.debug("     Vendor - " + quote.getVendor());
-        //out.debug("  Pay Terms - " + quote.getPayTerms());
-        //quote.setMemo(lines.get(quote.findSetTotal(lines)-1));
-        if (lineSize <= 40) {
-            Order order = new Order(true);
+        if (true) {
+            Order order = new Order(false);
             order.setDesc(lines.get(28));
             order.setQuantity(lines.get(29));
             order.setRate(lines.get(30));
@@ -65,17 +63,15 @@ public class WSL {
             order.setAmount(lines.get(33));
             quote.addOrder(order.isValid(out));
             out.debug("Description - " + order.getDesc());
-            out.debug("   Quantity - " + order.getQuantity());
-            out.debug("       Rate - " + order.getRate());
-            out.debug("        Job - " + order.getJob());
-            out.debug("     Amount - " + order.getAmount());
+            out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
+            out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
+            out.debug("  Ext Price - " + order.getAmount());
             if(quote.getLastOrder().getDesc().isBlank()){
                 quote.removeOrder(quote.getOrders().size()-1);
                 out.debug("Removing that last one");
             }
-            //out.debug("       Memo - " + quote.getMemo());
-            out.debug("      Total - $" + quote.getTotal());
-        }
+            out.debug("     Amount - " + quote.getTotal());
+        }*/
         out.println();
         return quote.isValid(out);
     }

@@ -10,6 +10,7 @@ public class Quote {
     private double snh;
     private double tax;
     private double total; //amount due
+    private Stuff s = new Stuff();
     public Quote(int id, int custnum, int[] date, String vendor, ArrayList<Order> orders, double total) {
         this.id = id;
         this.custnum = custnum;
@@ -187,16 +188,7 @@ public class Quote {
         return oldTotal;
     }
     
-    private String csvCommas(Object[] all) {
-        String concat = "";
-        for (int i=0; i<all.length-1; i++) {
-            concat += all[i]+",";
-        }
-        concat += all[all.length-1];
-        return concat;
-    }
     public String toCSV() {
-        Stuff s = new Stuff();
         String concat = "";
         boolean isBeginning = true;
         for (Order o : this.orders) {
@@ -205,14 +197,19 @@ public class Quote {
                 this.getCustomerNum(),
                 this.getDateString(),
                 this.getVendor(),
-                o.getQuantity()+o.getQtyUnit(),
+                o.getQuantity(),
+                o.getQtyUnit(),
                 o.getDesc(),
-                o.getRate() + "/" + o.getRateUnit(),
+                o.getRate(),
+                o.getRateUnit(),
                 "\"" + s.formatDoubleWithCommas(o.getAmount()) + "\"",
                 "\"$" + s.formatDoubleWithCommas(this.getTotal()) + "\"",
                 isBeginning
             };
-            if (isBeginning) {isBeginning = false; concat += this.csvCommas(obj);} else concat += "\n" + this.csvCommas(obj);
+            if (isBeginning) {
+                isBeginning = false;
+                concat += s.csvCommas(obj);
+            } else concat += "\n" + s.csvCommas(obj);
         }
         return concat;
     }

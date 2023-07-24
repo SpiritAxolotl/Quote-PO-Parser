@@ -46,8 +46,10 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         Out out = new Out("src\\outputs\\output.txt");
-        PrintWriter outCSV = new PrintWriter("src\\outputs\\POs.csv");
-        outCSV.println("ID,Date,Vendor,Description,Quantity,Rate,Job,Amount,Total,Memo,Payment Terms,Tracker");
+        PrintWriter outPOs = new PrintWriter("src\\outputs\\POs.csv");
+        PrintWriter outQuotes = new PrintWriter("src\\outputs\\Quotes.csv");
+        outPOs.println("ID,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Tracker");
+        outQuotes.println("Vendor Name,Quote Number,Customer Number,Ship Date,Qty,Qty Unit,Description,Unit Price,Unit Price Unit,Ext Price,Subtotal,S&H,Tax,Total,Tracker");
         File temp = new File("src\\temp.txt");
         temp.deleteOnExit();
         ArrayList<String> matchList = new ArrayList<String>();
@@ -102,11 +104,11 @@ public class App {
             }
         }
         for (int id : pairs.keySet()) {
-            outCSV.println(pairs.get(id).toCSV());
+            outPOs.println(pairs.get(id).toCSV());
         }
         
-        outCSV.close();
-        //outQuotes.close();
+        outPOs.close();
+        outQuotes.close();
         out.close();
     }
 }

@@ -66,4 +66,13 @@ public class Stuff {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         return decimalFormat.format(number);
     }
+    
+    public String csvCommas(Object[] all) {
+        String concat = "";
+        for (int i=0; i<all.length-1; i++) {
+            concat += all[i]+",";
+        }
+        concat += all[all.length-1];
+        return concat;
+    }
 }
