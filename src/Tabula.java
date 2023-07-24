@@ -18,59 +18,15 @@ import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 //Vendor name, quote date, vendor quote number, our reference, product code, product description, quantity, unit price, total price per line.
 public class Tabula {
-    public static int[] intArrayListToArray(ArrayList<Integer> ints) {
-        int[] integers = new int[ints.size()];
-        for (int i=0; i<ints.size(); i++) {
-            integers[i] = ints.get(i);
-        }
-        return integers;
-    }
-    public static ArrayList<Integer> intArrayToArrayList(int[] ints) {
-        ArrayList<Integer> integers = new ArrayList<Integer>();
-        for (int i : ints) {
-            integers.add(i);
-        }
-        return integers;
-    }
-    public int findThing(ArrayList<String> strings, int index) {
-        for(int i=index; i<strings.size(); i++) {
-            if (!strings.get(i).isBlank()) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    public int findThing(ArrayList<String> strings, int[] indexes) {
-        int index = 0;
-        for(int i=0; i<indexes.length; i++) {
-            index = findThing(strings, index + indexes[i]) + 1;
-        }
-        return index - 1;
-    }
-    public int findSpecificThing(ArrayList<String> strings, String target) {
-        for(int i=0; i<strings.size(); i++) {
-            if (strings.get(i).equals(target)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    public int findSpecificThing(ArrayList<String> strings, String target, int index) {
-        for(int i=index; i<strings.size(); i++) {
-            if (strings.get(i).equals(target)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    //mostly written by someone else:
     public PO readTables(File file, Out out) throws Exception {
+        Stuff s = new Stuff();
         if (file.exists()) {
             out.println("File exists!");
             //out.println("Debug: " + file.getPath().substring(file.getPath().indexOf("\\")+1));
         } else {
             out.println("File doesn't exist :(");
         }
+        //written by not me
         InputStream in = this.getClass().getClassLoader().getResourceAsStream(file.getPath().substring(file.getPath().indexOf("\\")+1));
         PrintWriter pw = new PrintWriter("src\\temp.txt");
         //extract tables from document
@@ -146,7 +102,7 @@ public class Tabula {
             out.debug("       Memo - " + po.getMemo());
             out.debug("      Total - $" + po.getTotal());
         } else if (lineSize <= 88) {
-            for (int i=findThing(lines, new int[] {11,1,6})-1; i<=lineSize-12; i+=6) {
+            for (int i=s.findThing(lines, new int[] {11,1,6})-1; i<=lineSize-12; i+=6) {
                 Order order = new Order(true);
                 order.setDesc(lines.get(i));
                 order.setQuantity(lines.get(i+1));
@@ -176,9 +132,9 @@ public class Tabula {
             System.out.println((test+=2) + " | 1 expected");
             System.out.println((test) + " | 3 expected");
             test+=2;*/
-            int index = findThing(lines, new int[] {11,1,6});
+            int index = s.findThing(lines, new int[] {11,1,6});
             boolean toggle = true;
-            for (int i=index; i<=lineSize-24; i=findThing(lines, i)) {
+            for (int i=index; i<=lineSize-24; i=s.findThing(lines, i)) {
                 Order order = new Order(true);
                 if (toggle) {
                     order.setDesc(lines.get(i++));

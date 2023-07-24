@@ -72,18 +72,22 @@ public class App {
                 out.println("Current file: " + aPDF.getName());
                 out.println("Filepath: " + aPDF.getPath());
                 if (match(matchList.get(0), aPDF.getName())) {
-                    //out.println("Matches!\n");
+                    out.println("Matches! Type is PO");
                     po = t.readTables(aPDF, out);
                     poMap.put(po.getID(), po);
                 } else {
                     boolean a = true;
                     if (match(matchList.get(1), aPDF.getName())) {
+                        out.println("Matches! Type is 1");
                         quotes.add(wsl.readTables(aPDF, out, 0));
                     } else if (match(matchList.get(2), aPDF.getName())) {
+                        out.println("Matches! Type is 2");
                         quotes.add(wsl.readTables(aPDF, out, 1));
                     } else if (match(matchList.get(3), aPDF.getName())) {
+                        out.println("Matches! Type is 3");
                         quotes.add(wsl.readTables(aPDF, out, 2));
                     } else if (match(matchList.get(4), aPDF.getName())) {
+                        out.println("Matches! Type is 4");
                         quotes.add(wsl.readTables(aPDF, out, 3));
                     } else {
                         out.println("File didn't match.\n");
