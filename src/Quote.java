@@ -92,6 +92,13 @@ public class Quote {
     public Order getOrder(int num) {
         return this.orders.get(num);
     }
+    public Order[] getOrdersArray() {
+        Order[] orders = new Order[this.orders.size()];
+        for (int i=0; i<this.orders.size(); i++) {
+            orders[i] = this.orders.get(i);
+        }
+        return orders;
+    }
     public Order getLastOrder() {
         return this.orders.get(this.orders.size()-1);
     }

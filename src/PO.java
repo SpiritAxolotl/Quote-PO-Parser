@@ -23,7 +23,7 @@ public class PO {
     public PO() {
         this(-1, new int[] {-1,-1,-1}, "", new ArrayList<Order>(), -1, "", "");
     }
-
+    
     public int getID() {
         return this.id;
     }
@@ -90,6 +90,13 @@ public class PO {
     }
     public Order getOrder(int num) {
         return this.orders.get(num);
+    }
+    public Order[] getOrdersArray() {
+        Order[] orders = new Order[this.orders.size()];
+        for (int i=0; i<this.orders.size(); i++) {
+            orders[i] = this.orders.get(i);
+        }
+        return orders;
     }
     public Order getLastOrder() {
         return this.orders.get(this.orders.size()-1);

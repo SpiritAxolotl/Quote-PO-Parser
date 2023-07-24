@@ -21,6 +21,40 @@ public class App {
         Matcher m = p.matcher(match);
         return m.matches();
     }
+    public PO findPO(int id){
+        for(PO po : poList) {
+            if (po.getID() == id) {
+                return po;
+            }
+        }
+        return null;
+    }
+    public Quote findQuote(int id){
+        for(Quote quote : quoteList) {
+            if (quote.getID() == id) {
+                return quote;
+            }
+        }
+        return null;
+    }
+    public String[] findSuppliesPO(int id){
+        PO po = this.findPO(id);
+        Order[] temp = po.getOrdersArray();
+        String[] descList = new String[temp.length];
+        for (int i=0; i<temp.length; i++) {
+            descList[i] = temp[i].getDesc();
+        }
+        return descList;
+    }
+    public String[] findSuppliesQuote(int id){
+        Quote quote = this.findQuote(id);
+        Order[] temp = quote.getOrdersArray();
+        String[] descList = new String[temp.length];
+        for (int i=0; i<temp.length; i++) {
+            descList[i] = temp[i].getDesc();
+        }
+        return descList;
+    }
     //PO ID, date, vendor, orders(desc, quantity, rate, job, amount), total, tracker
     //reminder: comment how everything works later.
 
