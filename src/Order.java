@@ -41,6 +41,11 @@ public class Order {
         this.desc = desc.replaceAll("\uFFFD", "-");
         return oldDesc;
     }
+    public String appendDesc(String desc) {
+        String oldDesc = this.desc;
+        this.desc += desc.replaceAll("\uFFFD", "-");
+        return oldDesc;
+    }
     public int getQuantity() {
         return this.quantity;
     }

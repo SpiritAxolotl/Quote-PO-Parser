@@ -137,6 +137,9 @@ public class Quote {
     public Order setOrder(int num, Order order) {
         return this.orders.set(num, order);
     }
+    public void addOrders(ArrayList<Order> orderlist) {
+        orders.addAll(orderlist);
+    }
     public Order removeOrder(int num) {
         return this.orders.remove(num);
     }

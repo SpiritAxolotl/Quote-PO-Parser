@@ -58,29 +58,37 @@ public class WSL {
             out.debug("CustomerNum - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
-            if (true) {
-                Order order = new Order(false);
-                for(int i=0; i<lineSize; i++){
-                    if(lines[i].isBlank()) continue;
-                    if(lines[i].equals("Description"));
-                /*order.setDesc(lines[28]);
-                order.setQuantity(lines[29]);
-                order.setRate(lines[30]);
-                order.setJob(lines[31]);
-                order.setAmount(lines[33]);
-                quote.addOrder(order.isValid(out));*/
-                quote.addOrder(order);
-                out.debug("Description - " + order.getDesc());
-                out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
-                out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
-                out.debug("  Ext Price - " + order.getAmount());
-                /*if(quote.getLastOrder().getDesc().isBlank()){
-                    quote.removeOrder(quote.getOrders().size()-1);
-                    out.debug("Removing that last one");
-                }*/
-                out.debug("     Amount - " + quote.getTotal());
+            int index = 0;
+            for(; index<lineSize; index++){
+                if(lines[index].isBlank()) continue;
+                if(lines[index].equals("DESCRIPTION")){
+                    index += 2;
+                    break;
                 }
             }
+            ArrayList<Order> orderlist = new ArrayList<Order>();
+            //Order order = new Order(false);
+            int count = 0;
+            while(!lines[index].isBlank()){
+                int sep = lines[index].indexOf(" ");
+                if(lines[index].isBlank()) {index+=16; break;}
+                if(lines[index].substring(0, sep).matches("\\d+[a-z]{1,3}")){
+                    orderlist.add(new Order(false));
+                    orderlist.get(count).setDesc(lines[index].substring(sep+1));
+                } else {
+                    orderlist.get(count).appendDesc(" | " + lines[index].substring(sep+1));
+                }
+            }
+            quote.addOrders(orderlist);
+            /*out.debug("Description - " + order.getDesc());
+            out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
+            out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
+            out.debug("  Ext Price - " + order.getAmount());*/
+            /*if(quote.getLastOrder().getDesc().isBlank()){
+                quote.removeOrder(quote.getOrders().size()-1);
+                out.debug("Removing that last one");
+            }*/
+            out.debug("     Amount - " + quote.getTotal());
             break;
         }
         out.println();
