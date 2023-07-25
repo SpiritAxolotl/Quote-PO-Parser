@@ -18,7 +18,7 @@ public class App {
     //static ArrayList<PO> poList = new ArrayList<PO>();
     //static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
-    public static boolean match(String regex, String match) {
+    public static boolean match(String regex, String match){
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(match);
         return m.matches();
@@ -103,8 +103,11 @@ public class App {
                 out.println("Error linking PO and Quote. Ignoring for now...");
             }
         }
-        for (int id : pairs.keySet()) {
-            outPOs.println(pairs.get(id).toCSV());
+        for (int id : poMap.keySet()) {
+            outPOs.println(poMap.get(id).toCSV());
+        }
+        for (int id : quoteMap.keySet()) {
+            outQuotes.println(quoteMap.get(id).toCSV());
         }
         
         outPOs.close();

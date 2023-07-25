@@ -4,19 +4,33 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class Stuff {
-    public static int[] intArrayListToArray(ArrayList<Integer> ints) {
+    public int[] intArrayListToArray(ArrayList<Integer> ints) {
         int[] integers = new int[ints.size()];
         for (int i=0; i<ints.size(); i++) {
             integers[i] = ints.get(i);
         }
         return integers;
     }
-    public static ArrayList<Integer> intArrayToArrayList(int[] ints) {
+    public ArrayList<Integer> intArrayToArrayList(int[] ints) {
         ArrayList<Integer> integers = new ArrayList<Integer>();
         for (int i : ints) {
             integers.add(i);
         }
         return integers;
+    }
+    public String[] stringArrayListToArray(ArrayList<String> strs) {
+        String[] strings = new String[strs.size()];
+        for (int i=0; i<strs.size(); i++) {
+            strings[i] = strs.get(i);
+        }
+        return strings;
+    }
+    public ArrayList<String> stringArrayToArrayList(String[] strs) {
+        ArrayList<String> strings = new ArrayList<String>();
+        for (String i : strs) {
+            strings.add(i);
+        }
+        return strings;
     }
     public int findThing(ArrayList<String> strings, int index) {
         for(int i=index; i<strings.size(); i++) {

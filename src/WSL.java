@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class WSL {
     public Quote readTables(File file, Out out, int type) throws Exception {
-        @SuppressWarnings("unused") Stuff s = new Stuff();
+        Stuff s = new Stuff();
         try {
             // Define the WSL command to run
             String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"src/temp.txt\"";
@@ -35,44 +35,56 @@ public class WSL {
             e.printStackTrace();
         }
         Scanner scan = new Scanner(new File("src\\temp.txt"));
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> linest = new ArrayList<String>();
         int k = 0;
         while (scan.hasNextLine()) {
             String curr = scan.nextLine().strip();
-            lines.add(curr);
+            linest.add(curr);
             out.println(k + ": " + curr);
             k++;
         }
         scan.close();
-        @SuppressWarnings("unused") int lineSize = lines.size();
+        String[] lines = s.stringArrayListToArray(linest);
+        int lineSize = lines.length;
         //Parsing the stuff in the java table
         Quote quote = new Quote();
-        /*quote.setID(lines.get(5));
-        quote.setDate(lines.get(4));
-        quote.setVendor(lines.get(7));
-        out.debug("  Quote Num - " + quote.getID());
-        out.debug("CustomerNum - " + quote.getID());
-        out.debug("  Ship Date - " + quote.getDateString());
-        out.debug("     Vendor - " + quote.getVendor());
-        if (true) {
-            Order order = new Order(false);
-            order.setDesc(lines.get(28));
-            order.setQuantity(lines.get(29));
-            order.setRate(lines.get(30));
-            order.setJob(lines.get(31));
-            order.setAmount(lines.get(33));
-            quote.addOrder(order.isValid(out));
-            out.debug("Description - " + order.getDesc());
-            out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
-            out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
-            out.debug("  Ext Price - " + order.getAmount());
-            if(quote.getLastOrder().getDesc().isBlank()){
-                quote.removeOrder(quote.getOrders().size()-1);
-                out.debug("Removing that last one");
+        switch(type) {
+        case 0:
+            quote.setID(lines[14]);
+            quote.setCustomerNum(lines[48]);
+            quote.setDate(lines[68]);
+            quote.setVendor(lines[17]);
+            out.debug("  Quote Num - " + quote.getID());
+            out.debug("CustomerNum - " + quote.getCustomerNum());
+            out.debug("  Ship Date - " + quote.getDateString());
+            out.debug("     Vendor - " + quote.getVendor());
+            if (true) {
+                Order order = new Order(false);
+                for(int i=0; i<lineSize; i++){
+                    if(lines[i].isBlank()) continue;
+                    if(lines[i].equals("Description"));
+                /*order.setDesc(lines[28]);
+                order.setQuantity(lines[29]);
+                order.setRate(lines[30]);
+                order.setJob(lines[31]);
+                order.setAmount(lines[33]);
+                quote.addOrder(order.isValid(out));*/
+                quote.addOrder(order);
+                out.debug("Description - " + order.getDesc());
+                out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
+                out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
+                out.debug("  Ext Price - " + order.getAmount());
+                /*if(quote.getLastOrder().getDesc().isBlank()){
+                    quote.removeOrder(quote.getOrders().size()-1);
+                    out.debug("Removing that last one");
+                }*/
+                out.debug("     Amount - " + quote.getTotal());
+                }
             }
-            out.debug("     Amount - " + quote.getTotal());
-        }*/
+            break;
+        }
         out.println();
-        return quote.isValid(out);
+        //return quote.isValid(out);
+        return quote;
     }
 }

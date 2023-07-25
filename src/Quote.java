@@ -34,7 +34,11 @@ public class Quote {
     public int setID(String id) {
         int oldID = this.id;
         try {
+            if (id.substring(0,1).equals("S")) {
+                this.id = Integer.parseInt(id.substring(1));
+            } else {
             this.id = Integer.parseInt(id);
+            }
         } catch (NullPointerException | NumberFormatException er) {}
         return oldID;
     }
@@ -98,7 +102,11 @@ public class Quote {
     }
     public String setVendor(String vendor) {
         String oldVendor = this.vendor;
-        this.vendor = vendor;
+        /*if(vendor.contains("Atlanta Electrical Distributions")) {
+            this.vendor = "AED";
+        } else {*/
+            this.vendor = vendor;
+        //}
         return oldVendor;
     }
     public Order getOrder() {
