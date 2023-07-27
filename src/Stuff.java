@@ -119,4 +119,14 @@ public class Stuff {
         }
         return text;
     }
+    
+    public int[] instancesOf(String[] str, String match) {
+        ArrayList<Integer> ints = new ArrayList<Integer>();
+        for (int i=0; i<str.length; i++) {
+            if (str[i].equals(match)) {
+                ints.add(i);
+            }
+        }
+        return intArrayListToArray(ints);
+    }
 }

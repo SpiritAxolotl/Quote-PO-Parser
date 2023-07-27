@@ -168,7 +168,7 @@ public class Quote {
         this.tax = tax;
         return oldTax;
     }
-    public double findTax(double tax) {
+    public double findTax() {
         double oldTax = this.tax;
         //if they're invalid there's no fallback yet
         this.tax = this.getTotal() - this.getSubtotal() - this.getSNH();

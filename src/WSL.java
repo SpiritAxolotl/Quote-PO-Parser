@@ -36,12 +36,10 @@ public class WSL {
         }
         Scanner scan = new Scanner(new File("src\\temp.txt"));
         ArrayList<String> linest = new ArrayList<String>();
-        int k = 0;
-        while (scan.hasNextLine()) {
+        for (int k=0; scan.hasNextLine(); k++) {
             String curr = scan.nextLine().strip();
             linest.add(curr);
             out.println(k + ": " + curr);
-            k++;
         }
         scan.close();
         String[] lines = s.stringArrayListToArray(linest);
@@ -59,54 +57,62 @@ public class WSL {
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
             int index = 0;
-            while(!lines[index].equals("DESCRIPTION") && index<lineSize) {
-                index++;
-            }
-            ArrayList<Order> orderlist = new ArrayList<Order>();
-            //Order order = new Order(false);
-            int count = 0;
-            while(!lines[index].isBlank() && index<lineSize){
-                int sep = lines[index].indexOf(" ");
-                if(lines[index].substring(0, sep).matches("\\d+[a-z]{1,3}")){
-                    orderlist.add(new Order(false));
-                    orderlist.get(count).setDesc(lines[index].substring(sep+1));
-                } else {
-                    orderlist.get(count).appendDesc(" | " + lines[index].substring(sep+1));
+            //int pages = Integer.parseInt(lines[26].substring(lines[26].length()-1));
+            //do this for every page
+            for (int v : s.instancesOf(lines, "Quotation")) {
+                index = v;
+                while(!lines[index].equals("DESCRIPTION") && index<lineSize) {
+                    index++;
                 }
-            }
-            //skip a part that we don't need but is always the same
-            index += 16;
-            //we need another two to keep track of the orderlist stuff
-            int[] count2 = {0,0};
-            //true = unit price, false = ext price
-            boolean toggle = true;
-            while(!lines[index].equals("Subtotal") && index<lineSize) {
-                if(lines[index].isBlank()){
-                    toggle = !toggle;
-                } else if (toggle){
-                    orderlist.get(count2[0]).setRate(lines[index]);
-                    count2[0]++;
-                } else {
-                    orderlist.get(count2[1]).setAmount(lines[index]);
-                    count2[1]++;
-                }
-                index++;
-            }
-            quote.addOrders(orderlist);
-            while(lines[index].equals("Subtotal") && index<lineSize) {
                 index += 2;
+                ArrayList<Order> orderlist = new ArrayList<Order>();
+                int count = 0;
+                while(!lines[index].isBlank() && index<lineSize){
+                    int sep = lines[index].indexOf(" ");
+                    if(lines[index].substring(0, sep).matches("\\d+[a-z]{1,3}")){
+                        orderlist.add(new Order(false));
+                        orderlist.get(count).setDesc(lines[index].substring(sep+1));
+                    } else {
+                        orderlist.get(count).appendDesc(" | " + lines[index].substring(sep+1));
+                    }
+                    index++;
+                }
+                //skip a part that we don't need but is always the same
+                index += 14;
+                if (lines[index].equals("EXT PRICE")) {
+                    //we need another two to keep track of the orderlist stuff
+                    int[] count2 = {0,0};
+                    //true = unit price, false = ext price
+                    boolean toggle = true;
+                    while(!lines[index].equals("Subtotal") && index<lineSize) {
+                        if(lines[index].isBlank()){
+                            toggle = !toggle;
+                        } else if (toggle){
+                            orderlist.get(count2[0]).setRate(lines[index]);
+                            count2[0]++;
+                        } else {
+                            orderlist.get(count2[1]).setAmount(lines[index]);
+                            count2[1]++;
+                        }
+                        index++;
+                    }
+                    quote.addOrders(orderlist);
+                    while(lines[index].equals("Subtotal") && index<lineSize) {
+                        index += 2;
+                    }
+                    quote.setSubtotal(lines[index]);
+                    quote.setSNH(lines[index+=4]);
+                    quote.setTotal(lines[index+=4]);
+                    quote.findTax();
+                } else {
+                    // stop when line doesn't match \\d+\\.\\d+\\/[a-z]|[A-X]+
+                }
+                
+                if(quote.getLastOrder().getDesc().isBlank()){
+                    quote.removeOrder(quote.getOrders().size()-1);
+                    out.debug("Removing that last one");
+                }
             }
-            quote.setSubtotal(lines[index]);
-            quote.setSNH(lines[index+=4]);
-            /*out.debug("Description - " + order.getDesc());
-            out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
-            out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
-            out.debug("  Ext Price - " + order.getAmount());*/
-            if(quote.getLastOrder().getDesc().isBlank()){
-                quote.removeOrder(quote.getOrders().size()-1);
-                out.debug("Removing that last one");
-            }
-            //out.debug("     Amount - " + quote.getTotal());
             break;
         }
         out.println();

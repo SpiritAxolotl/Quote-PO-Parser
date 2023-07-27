@@ -14,7 +14,7 @@ public class App {
     //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
     static HashMap<Integer, PO> poMap = new HashMap<Integer, PO>();
     static HashMap<Integer, Quote> quoteMap = new HashMap<Integer, Quote>();
-    static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
+    //static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
     //static ArrayList<PO> poList = new ArrayList<PO>();
     //static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
@@ -61,7 +61,7 @@ public class App {
         
         Tabula t = new Tabula();
         WSL wsl = new WSL();
-        int pairID = 0;
+        //int pairID = 0;
         //iterate through the files
         for (File folder : dir) {
             PO po = new PO();
@@ -76,16 +76,16 @@ public class App {
                 } else {
                     boolean a = true;
                     if (match(matchList.get(1), aPDF.getName())) {
-                        out.println("Matches! Type is 1");
+                        out.println("Matches! Type is 0");
                         quotes.add(wsl.readTables(aPDF, out, 0));
                     } else if (match(matchList.get(2), aPDF.getName())) {
-                        out.println("Matches! Type is 2");
+                        out.println("Matches! Type is 1");
                         quotes.add(wsl.readTables(aPDF, out, 1));
                     } else if (match(matchList.get(3), aPDF.getName())) {
-                        out.println("Matches! Type is 3");
+                        out.println("Matches! Type is 2");
                         quotes.add(wsl.readTables(aPDF, out, 2));
                     } else if (match(matchList.get(4), aPDF.getName())) {
-                        out.println("Matches! Type is 4");
+                        out.println("Matches! Type is 3");
                         quotes.add(wsl.readTables(aPDF, out, 3));
                     } else {
                         out.println("File didn't match.\n");
@@ -96,12 +96,14 @@ public class App {
                     }
                 }
             }
+            /*
             try {
-                pairs.put(pairID, new Pair(po.isValid(out), quotes));
+                pairs.put(pairID, new Pair(po, quotes));
                 pairID++;
             } catch (NullPointerException e) {
                 out.println("Error linking PO and Quote. Ignoring for now...");
             }
+            */
         }
         for (int id : poMap.keySet()) {
             outPOs.println(poMap.get(id).toCSV());
