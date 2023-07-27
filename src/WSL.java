@@ -59,19 +59,14 @@ public class WSL {
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
             int index = 0;
-            for(; index<lineSize; index++){
-                if(lines[index].isBlank()) continue;
-                if(lines[index].equals("DESCRIPTION")){
-                    index += 2;
-                    break;
-                }
+            while(!lines[index].equals("DESCRIPTION") && index<lineSize) {
+                index++;
             }
             ArrayList<Order> orderlist = new ArrayList<Order>();
             //Order order = new Order(false);
             int count = 0;
-            while(!lines[index].isBlank()){
+            while(!lines[index].isBlank() && index<lineSize){
                 int sep = lines[index].indexOf(" ");
-                if(lines[index].isBlank()) {index+=16; break;}
                 if(lines[index].substring(0, sep).matches("\\d+[a-z]{1,3}")){
                     orderlist.add(new Order(false));
                     orderlist.get(count).setDesc(lines[index].substring(sep+1));
@@ -79,16 +74,39 @@ public class WSL {
                     orderlist.get(count).appendDesc(" | " + lines[index].substring(sep+1));
                 }
             }
+            //skip a part that we don't need but is always the same
+            index += 16;
+            //we need another two to keep track of the orderlist stuff
+            int[] count2 = {0,0};
+            //true = unit price, false = ext price
+            boolean toggle = true;
+            while(!lines[index].equals("Subtotal") && index<lineSize) {
+                if(lines[index].isBlank()){
+                    toggle = !toggle;
+                } else if (toggle){
+                    orderlist.get(count2[0]).setRate(lines[index]);
+                    count2[0]++;
+                } else {
+                    orderlist.get(count2[1]).setAmount(lines[index]);
+                    count2[1]++;
+                }
+                index++;
+            }
             quote.addOrders(orderlist);
+            while(lines[index].equals("Subtotal") && index<lineSize) {
+                index += 2;
+            }
+            quote.setSubtotal(lines[index]);
+            quote.setSNH(lines[index+=4]);
             /*out.debug("Description - " + order.getDesc());
             out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
             out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
             out.debug("  Ext Price - " + order.getAmount());*/
-            /*if(quote.getLastOrder().getDesc().isBlank()){
+            if(quote.getLastOrder().getDesc().isBlank()){
                 quote.removeOrder(quote.getOrders().size()-1);
                 out.debug("Removing that last one");
-            }*/
-            out.debug("     Amount - " + quote.getTotal());
+            }
+            //out.debug("     Amount - " + quote.getTotal());
             break;
         }
         out.println();

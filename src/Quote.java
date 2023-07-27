@@ -88,25 +88,18 @@ public class Quote {
         return oldDate;
     }
     public int[] setDate(String date) {
-        int[] oldDate = this.date;
         String[] newDate = date.split("/");
-        try {
-            this.date[0] = Integer.parseInt(newDate[0]);
-            this.date[1] = Integer.parseInt(newDate[1]);
-            this.date[2] = Integer.parseInt(newDate[2]);
-        } catch (NullPointerException | NumberFormatException er) {}
-        return oldDate;
+        return this.setDate(newDate);
     }
     public String getVendor() {
         return this.vendor;
     }
     public String setVendor(String vendor) {
         String oldVendor = this.vendor;
-        /*if(vendor.contains("Atlanta Electrical Distributions")) {
+        /*if(vendor.contains("Atlanta Electrical Distributions"))
             this.vendor = "AED";
-        } else {*/
-            this.vendor = vendor;
-        //}
+        else*/
+        this.vendor = vendor;
         return oldVendor;
     }
     public Order getOrder() {
@@ -151,6 +144,10 @@ public class Quote {
         this.subtotal = subtotal;
         return oldSubtotal;
     }
+    public double setSNH(String snh) {
+        String cleanSNH = snh.strip().replaceAll(",", "");
+        return this.setSNH(Double.parseDouble(cleanSNH.substring(cleanSNH.indexOf("$")+1,cleanSNH.length()-1)));
+    }
     public double getSNH() {
         return this.snh;
     }
@@ -158,6 +155,10 @@ public class Quote {
         double oldSNH = this.snh;
         this.snh = snh;
         return oldSNH;
+    }
+    public double setSubtotal(String subtotal) {
+        String cleanSubtotal = subtotal.strip().replaceAll(",", "");
+        return this.setSubtotal(Double.parseDouble(cleanSubtotal.substring(cleanSubtotal.indexOf("$")+1,cleanSubtotal.length()-1)));
     }
     public double getTax() {
         return this.tax;
@@ -191,12 +192,8 @@ public class Quote {
         return -1;
     }
     public double setTotal(String total) {
-        String cleanTotal = total.trim().replaceAll(",", "");
-        System.out.println(cleanTotal);
-        //System.out.println(cleanTotal.substring(cleanTotal.indexOf("$")+2,cleanTotal.length()-1));
-        double oldTotal = this.total;
-        this.total = Double.parseDouble(cleanTotal.substring(cleanTotal.indexOf("$")+1,cleanTotal.length()-1));
-        return oldTotal;
+        String cleanTotal = total.strip().replaceAll(",", "");
+        return this.setTotal(Double.parseDouble(cleanTotal.substring(cleanTotal.indexOf("$")+1,cleanTotal.length()-1)));
     }
     
     public String toCSV() {
@@ -213,8 +210,8 @@ public class Quote {
                 o.getDesc(),
                 o.getRate(),
                 o.getRateUnit(),
-                "\"" + s.formatDoubleWithCommas(o.getAmount()) + "\"",
-                "\"$" + s.formatDoubleWithCommas(this.getTotal()) + "\"",
+                "\"" + s.formatDoubleWithCommas(o.getAmount(), false) + "\"",
+                "\"$" + s.formatDoubleWithCommas(this.getTotal(), true) + "\"",
                 isBeginning
             };
             if (isBeginning) {
@@ -249,7 +246,6 @@ public class Quote {
                 message += "Amount, ";
             }
             message = message.substring(0, message.length()-2);
-            //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
             out.println(message);
             //out.close();
             //throw new NullPointerException(message);

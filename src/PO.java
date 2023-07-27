@@ -1,7 +1,4 @@
 import java.util.ArrayList;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class PO {
     private int id;
@@ -76,6 +73,25 @@ public class PO {
             this.date[2] = Integer.parseInt(newDate[2]);
         } catch (NullPointerException | NumberFormatException er) {}
         return oldDate;
+    }
+    public int findSetDate(ArrayList<String> strings) {
+        for(int i=11; i<strings.size(); i++) {
+            if (!strings.get(i).isBlank()) {
+                this.setDate(strings.get(i));
+                return i;
+            }
+        }
+        return -1;
+    }
+    //idk why I wrote this but it definitely is used so I won't touch it
+    public int findDescDate(ArrayList<String> strings) {
+        for(int i=findSetDate(strings)+1; i<strings.size(); i++) {
+            if (!strings.get(i).isBlank()) {
+                //this.setDate(strings.get(i));
+                return i;
+            }
+        }
+        return -1;
     }
     public String getVendor() {
         return this.vendor;
@@ -156,31 +172,9 @@ public class PO {
         }
         return -1;
     }
-    public int findSetDate(ArrayList<String> strings) {
-        for(int i=11; i<strings.size(); i++) {
-            if (!strings.get(i).isBlank()) {
-                this.setDate(strings.get(i));
-                return i;
-            }
-        }
-        return -1;
-    }
-    public int findDescDate(ArrayList<String> strings) {
-        for(int i=findSetDate(strings)+1; i<strings.size(); i++) {
-            if (!strings.get(i).isBlank()) {
-                //this.setDate(strings.get(i));
-                return i;
-            }
-        }
-        return -1;
-    }
     public double setTotal(String total) {
         String cleanTotal = total.trim().replaceAll(",", "");
-        //System.out.println(cleanTotal);
-        //System.out.println(cleanTotal.substring(cleanTotal.indexOf("$")+2,cleanTotal.length()-1));
-        double oldTotal = this.total;
-        this.total = Double.parseDouble(cleanTotal.substring(cleanTotal.indexOf("$")+1,cleanTotal.length()-1));
-        return oldTotal;
+        return this.setTotal(Double.parseDouble(cleanTotal.substring(cleanTotal.indexOf("$")+1,cleanTotal.length()-1)));
     }
     public String getMemo() {
         return this.memo;
@@ -199,49 +193,8 @@ public class PO {
         return oldPayTerms;
     }
     
-    public String intToString(double num) {
-        if (num < 0) {
-            return "";
-        }
-        return "" + num;
-    }
-    
-    public String formatDoubleWithCommas(double number, boolean isDollar) {
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        DecimalFormat decimalFormat = (DecimalFormat) numberFormat;
-        if (isDollar) {
-            decimalFormat.applyPattern("$#,##0.00");
-        } else {
-            decimalFormat.applyPattern("#,##0.00");
-        }
-        return decimalFormat.format(number);
-    }
-    
-    public String formatDouble(double number) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        return decimalFormat.format(number);
-    }
-    
-    private String csvCommas(Object[] all) {
-        String concat = "";
-        for (int i=0; i<all.length-1; i++) {
-            concat += this.inputSanitizer(all[i].toString())+",";
-        }
-        concat += all[all.length-1];
-        return concat;
-    }
-    //note that this doesn't FULLY sanitize the entire input
-    //it will get f'd up if there are single doublequotes
-    //and I pray none of the inputs have them
-    //(but if they do it will be obvious when it happens)
-    //update: it was obvious when it happened. fixing now...
-    public String inputSanitizer(String text) {
-        if (text.contains(",")||text.contains("\"")) {
-            text = "\"" + text.replaceAll("\"", "\"\"") + "\"";
-        }
-        return text;
-    }
     public String toCSV() {
+        Stuff s = new Stuff();
         String concat = "";
         boolean isBeginning = true;
         for (Order o : this.orders) {
@@ -250,20 +203,20 @@ public class PO {
                 this.getDateString(),
                 this.getVendor(),
                 o.getDesc(),
-                this.intToString(o.getQuantity()),
-                this.formatDoubleWithCommas(o.getRate(), false),
+                s.intToString(o.getQuantity()),
+                s.formatDoubleWithCommas(o.getRate(), false),
                 o.getJob(),
-                this.formatDoubleWithCommas(o.getAmount(), false),
-                this.formatDoubleWithCommas(this.getTotal(), true),
+                s.formatDoubleWithCommas(o.getAmount(), false),
+                s.formatDoubleWithCommas(this.getTotal(), true),
                 this.getMemo(),
                 this.getPayTerms(),
                 isBeginning
             };
             if (isBeginning) {
                 isBeginning = false; 
-                concat += this.csvCommas(obj);
+                concat += s.csvCommas(obj);
             } else {
-                concat += "\n" + this.csvCommas(obj);
+                concat += "\n" + s.csvCommas(obj);
             }
         }
         return concat;
@@ -275,9 +228,9 @@ public class PO {
             this.getVendor().isBlank() ||
             this.getTotal() == -1
         ){
-            String message = "Parameters missing: ";
+            String message = "Parameters missing: PO ";
             if (this.getID() == -1) {
-                message += "PO ID, ";
+                message += "ID, ";
             }
             if (this.getDate(0) == -1 || this.getDate(1) == -1 || this.getDate(2) == -1) {
                 message += "Date, ";
@@ -289,7 +242,6 @@ public class PO {
                 message += "Total, ";
             }
             message = message.substring(0, message.length()-2);
-            //-1, new int[3], "", new ArrayList<Order>(), -1, "", ""
             out.println(message);
             out.close();
             throw new NullPointerException(message);
