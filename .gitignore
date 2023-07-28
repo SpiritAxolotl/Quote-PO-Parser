@@ -4,3 +4,4 @@
 **/outputs/**
 temp.txt
 .vscode/**
+.vscode/launch.json
