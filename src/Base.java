@@ -38,6 +38,33 @@ public abstract class Base {
         return strings;
     }
     
+    public int findNextValue(String[] strings, int index, boolean quote) {
+        for(int i=index; i<strings.length; i++) {
+            try {
+                if (quote && strings[i].length()>0) {
+                    Integer.parseInt(strings[i].substring(1));
+                } else {
+                    Integer.parseInt(strings[i]);
+                }
+                return i;
+            } catch (NumberFormatException e) {}
+        }
+        return -1;
+    }
+    
+    public int findNextDateValue(String[] strings, int index) {
+        for(int i=index; i<strings.length; i++) {
+            try {
+                String[] split = strings[i].split("/");
+                Integer.parseInt(split[0]);
+                Integer.parseInt(split[1]);
+                Integer.parseInt(split[2]);
+                return i;
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {}
+        }
+        return -1;
+    }
+    
     public int findThing(ArrayList<String> strings, int index) {
         for(int i=index; i<strings.size(); i++) {
             if (!strings.get(i).isBlank()) {
@@ -58,6 +85,15 @@ public abstract class Base {
     public int findSpecificThing(String[] strings, String target) {
         for(int i=0; i<strings.length; i++) {
             if (strings[i].equals(target)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    public int findSpecificThing(String[] strings, String target, String target2) {
+        for(int i=0; i<strings.length; i++) {
+            if (strings[i].equals(target) || strings[i].equals(target2)) {
                 return i;
             }
         }

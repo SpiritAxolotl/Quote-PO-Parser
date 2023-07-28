@@ -200,14 +200,14 @@ public class Quote extends Base {
         boolean isBeginning = true;
         for (Order o : this.orders) {
             Object[] obj = {
+                this.getVendor(),
                 this.getID(),
                 this.getCustomerNum(),
                 this.getDateString(),
-                this.getVendor(),
-                o.getQuantity(),
+                intToString(o.getQuantity()),
                 o.getQtyUnit(),
                 o.getDesc(),
-                o.getRate(),
+                intToString(o.getRate()),
                 o.getRateUnit(),
                 "\"" + formatDoubleWithCommas(o.getAmount(), false) + "\"",
                 "\"$" + formatDoubleWithCommas(this.getTotal(), true) + "\"",

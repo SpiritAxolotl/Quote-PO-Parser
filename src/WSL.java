@@ -47,10 +47,10 @@ public class WSL extends Base {
         Quote quote = new Quote();
         switch(type) {
         case 0:
-            quote.setID(lines[14]);
-            quote.setCustomerNum(lines[48]);
-            quote.setDate(lines[findSpecificThing(lines, "SHIP DATE")+10]);
-            quote.setVendor(lines[17]);
+            quote.setID(lines[findNextValue(lines, findSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
+            quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
+            quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
+            quote.setVendor(lines[1]);
             out.debug("  Quote Num - " + quote.getID());
             out.debug("CustomerNum - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
@@ -58,21 +58,32 @@ public class WSL extends Base {
             int index = 0;
             //int pages = Integer.parseInt(lines[26].substring(lines[26].length()-1));
             //do this for every page
-            for (int v : instancesOf(lines, "Quotation")) {
+            for (int v : instancesOf(lines, "Quotation")){
                 index = v;
-                while(!lines[index].equals("DESCRIPTION") && index<lineSize) {
+                while(!(lines[index].equals("DESCRIPTION") || lines[index].equals("EXT PRICE")) && index<lineSize) {
                     index++;
                 }
                 index += 2;
+                if(lines[index].equals("UNIT PRICE")){
+                    index += 2;
+                }
+                if(lines[index].equals("EXT PRICE")){
+                    index += 2;
+                }
+                if(lines[index].equals("SHIPPING INSTRUCTIONS")){
+                    index += 4;
+                }
                 ArrayList<Order> orderlist = new ArrayList<Order>();
-                int count = 0;
+                int count = -1;
                 while(!lines[index].isBlank() && index<lineSize){
                     int sep = lines[index].indexOf(" ");
-                    if(lines[index].substring(0, sep).matches("\\d+[a-z]{1,3}")){
+                    if(sep != -1 && lines[index].substring(0, sep).matches("\\d+[a-zA-Z]{1,3}")){
+                        count++;
                         orderlist.add(new Order(false));
                         orderlist.get(count).setDesc(lines[index].substring(sep+1));
+                        orderlist.get(count).setQuantity(lines[index].substring(0, sep));
                     } else {
-                        orderlist.get(count).appendDesc(" | " + lines[index].substring(sep+1));
+                        orderlist.get(count).appendDesc(" | " + lines[index]);
                     }
                     index++;
                 }
@@ -104,10 +115,16 @@ public class WSL extends Base {
                     quote.setSNH(lines[index+=4]);
                     quote.setTotal(lines[index+=4]);
                     quote.findTax();
+                    for(Order order : quote.getOrders()) {
+                        out.debug("Description - " + order.getDesc());
+                        out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
+                        out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
+                        out.debug("  Ext Price - " + order.getAmount());
+                    }
                 } else {
-                    // stop when line doesn't match \\d+\\.\\d+\\/[a-z]|[A-Z]+ or ^$
+                    // TODO: stop when line doesn't match \\d+\\.\\d+\\/[a-z]|[A-Z]+ or ^$
+                    out.println("TODO: FIX THIS CASE SOON");
                 }
-                
                 /*
                 if(quote.getLastOrder().getDesc().isBlank()){
                     quote.removeOrder(quote.getOrders().size()-1);

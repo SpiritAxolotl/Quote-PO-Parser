@@ -71,6 +71,7 @@ public class Order extends Base {
                     this.quantity = Integer.parseInt(cleanQty.substring(0,i));
                 }
             } catch (NullPointerException | NumberFormatException er) {
+                i--;
                 this.quantity = Integer.parseInt(cleanQty.substring(0,i));
                 this.qtyunit = cleanQty.substring(i);
             }
