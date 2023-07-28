@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 
 public class App extends Base {
@@ -18,11 +16,6 @@ public class App extends Base {
     //static ArrayList<PO> poList = new ArrayList<PO>();
     //static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
-    public static boolean match(String regex, String match){
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(match);
-        return m.matches();
-    }
     public String[] findSuppliesPO(int id){
         PO po = poMap.get(id);
         Order[] temp = po.getOrdersArray();
@@ -41,7 +34,6 @@ public class App extends Base {
         }
         return descList;
     }
-    //PO ID, date, vendor, orders(desc, quantity, rate, job, amount), total, tracker
     //reminder: comment how everything works later.
 
     public static void main(String[] args) throws Exception {
@@ -69,22 +61,22 @@ public class App extends Base {
             for (File aPDF : folder.listFiles()) {
                 out.println("Current file: " + aPDF.getName());
                 out.println("Filepath: " + aPDF.getPath());
-                if (match(matchList.get(0), aPDF.getName())) {
+                if (matchList.get(0).matches(aPDF.getName())) {
                     out.println("Matches! Type is PO");
                     po = t.readTables(aPDF, out);
                     poMap.put(po.getID(), po);
                 } else {
                     boolean a = true;
-                    if (match(matchList.get(1), aPDF.getName())) {
+                    if (matchList.get(1).matches(aPDF.getName())) {
                         out.println("Matches! Type is 0");
                         quotes.add(wsl.readTables(aPDF, out, 0));
-                    } else if (match(matchList.get(2), aPDF.getName())) {
+                    } else if (matchList.get(2).matches(aPDF.getName())) {
                         out.println("Matches! Type is 1");
                         quotes.add(wsl.readTables(aPDF, out, 1));
-                    } else if (match(matchList.get(3), aPDF.getName())) {
+                    } else if (matchList.get(3).matches(aPDF.getName())) {
                         out.println("Matches! Type is 2");
                         quotes.add(wsl.readTables(aPDF, out, 2));
-                    } else if (match(matchList.get(4), aPDF.getName())) {
+                    } else if (matchList.get(4).matches(aPDF.getName())) {
                         out.println("Matches! Type is 3");
                         quotes.add(wsl.readTables(aPDF, out, 3));
                     } else {
