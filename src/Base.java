@@ -2,6 +2,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class Base {
     public int[] intArrayListToArray(ArrayList<Integer> ints) {
@@ -128,5 +130,11 @@ public abstract class Base {
             }
         }
         return intArrayListToArray(ints);
+    }
+    
+    public static boolean match(String regex, String match){
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(match);
+        return m.matches();
     }
 }

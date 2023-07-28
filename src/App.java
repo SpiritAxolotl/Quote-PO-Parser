@@ -59,24 +59,24 @@ public class App extends Base {
             PO po = new PO();
             ArrayList<Quote> quotes = new ArrayList<Quote>(Arrays.asList(new Quote()));
             for (File aPDF : folder.listFiles()) {
-                out.println("Current file: " + aPDF.getName());
-                out.println("Filepath: " + aPDF.getPath());
-                if (matchList.get(0).matches(aPDF.getName())) {
+                out.println("Current file: \"" + aPDF.getName() + "\"");
+                out.println("Filepath: \"" + aPDF.getPath() + "\"");
+                if (match(matchList.get(0), (aPDF.getName()))) {
                     out.println("Matches! Type is PO");
                     po = t.readTables(aPDF, out);
                     poMap.put(po.getID(), po);
                 } else {
                     boolean a = true;
-                    if (matchList.get(1).matches(aPDF.getName())) {
+                    if (match(matchList.get(1), (aPDF.getName()))) {
                         out.println("Matches! Type is 0");
                         quotes.add(wsl.readTables(aPDF, out, 0));
-                    } else if (matchList.get(2).matches(aPDF.getName())) {
+                    } else if (match(matchList.get(2), (aPDF.getName()))) {
                         out.println("Matches! Type is 1");
                         quotes.add(wsl.readTables(aPDF, out, 1));
-                    } else if (matchList.get(3).matches(aPDF.getName())) {
+                    } else if (match(matchList.get(3), (aPDF.getName()))) {
                         out.println("Matches! Type is 2");
                         quotes.add(wsl.readTables(aPDF, out, 2));
-                    } else if (matchList.get(4).matches(aPDF.getName())) {
+                    } else if (match(matchList.get(4), (aPDF.getName()))) {
                         out.println("Matches! Type is 3");
                         quotes.add(wsl.readTables(aPDF, out, 3));
                     } else {
