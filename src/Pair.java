@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Pair {
+public class Pair extends Base {
     private PO po;
     private ArrayList<Quote> quotes;
     public Pair(PO po, ArrayList<Quote> quotes) {

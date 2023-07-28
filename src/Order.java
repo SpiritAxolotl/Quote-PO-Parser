@@ -1,4 +1,4 @@
-public class Order {
+public class Order extends Base {
     //"type" will be true if a po and false if a quote
     private boolean type;
     private String desc;
