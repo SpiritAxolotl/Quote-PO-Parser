@@ -144,7 +144,7 @@ public abstract class Base {
     public String csvCommas(Object[] all) {
         String concat = "";
         for (int i=0; i<all.length-1; i++) {
-            concat += all[i]+",";
+            concat += inputSanitizer(all[i].toString())+",";
         }
         concat += all[all.length-1];
         return concat;
@@ -161,7 +161,7 @@ public abstract class Base {
     //(but if they do it will be obvious when it happens)
     //update: it was obvious when it happened. fixing now...
     public String inputSanitizer(String text) {
-        if (text.contains(",")||text.contains("\"")) {
+        if (text.contains(",") || text.contains("\"")) {
             text = "\"" + text.replaceAll("\"", "\"\"") + "\"";
         }
         return text;

@@ -121,6 +121,10 @@ public class WSL extends Base {
                         out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
                         out.debug("  Ext Price - " + order.getAmount());
                     }
+                    out.debug("   Subtotal - " + quote.getSubtotal());
+                    out.debug("        S&H - " + quote.getSNH());
+                    out.debug("        Tax - " + quote.getTax());
+                    out.debug("      Total - " + quote.getTotal());
                 } else {
                     // TODO: stop when line doesn't match \\d+\\.\\d+\\/[a-z]|[A-Z]+ or ^$
                     out.println("TODO: FIX THIS CASE SOON");

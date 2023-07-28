@@ -209,8 +209,11 @@ public class Quote extends Base {
                 o.getDesc(),
                 intToString(o.getRate()),
                 o.getRateUnit(),
-                "\"" + formatDoubleWithCommas(o.getAmount(), false) + "\"",
-                "\"$" + formatDoubleWithCommas(this.getTotal(), true) + "\"",
+                intToString(o.getAmount()),
+                formatDoubleWithCommas(this.getSubtotal(), false),
+                formatDoubleWithCommas(this.getSNH(), false),
+                formatDoubleWithCommas(this.getTax(), false),
+                formatDoubleWithCommas(this.getTotal(), true),
                 isBeginning
             };
             if (isBeginning) {
