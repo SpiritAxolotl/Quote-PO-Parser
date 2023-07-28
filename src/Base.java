@@ -55,6 +55,15 @@ public abstract class Base {
         return index - 1;
     }
     
+    public int findSpecificThing(String[] strings, String target) {
+        for(int i=0; i<strings.length; i++) {
+            if (strings[i].equals(target)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     public int findSpecificThing(ArrayList<String> strings, String target) {
         for(int i=0; i<strings.size(); i++) {
             if (strings.get(i).equals(target)) {

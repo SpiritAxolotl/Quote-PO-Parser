@@ -15,7 +15,8 @@ Regardless, the inner workings are not *TOO* complicated. I am still relatively 
   - A lot of [bouncycastle](https://mvnrepository.com/artifact/org.bouncycastle)'s stuff idk I can't find links to their repos
   - [JTS](https://github.com/locationtech/jts)
   - [SLF4J](https://mvnrepository.com/artifact/org.slf4j) (wow I should use this)
-  
+- [pdftotext](https://github.com/spatie/pdf-to-text)
+
 ## Troubleshooting
 If something went wrong while running this and you are not Davey, uhh I'll change this in the actual release but for the public version I will not put my real professional contact info on here
 

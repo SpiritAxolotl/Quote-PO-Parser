@@ -104,7 +104,7 @@ public class Order extends Base {
                 this.rate = Double.parseDouble(split[0]);
                 this.rateunit = split[1];
             }
-        } catch (NullPointerException | NumberFormatException er) {}
+        } catch (NullPointerException | ArrayIndexOutOfBoundsException | NumberFormatException er) {}
         return oldRate;
     }
     public String setRateUnit(String rateunit) {

@@ -49,7 +49,7 @@ public class WSL extends Base {
         case 0:
             quote.setID(lines[14]);
             quote.setCustomerNum(lines[48]);
-            quote.setDate(lines[68]);
+            quote.setDate(lines[findSpecificThing(lines, "SHIP DATE")+10]);
             quote.setVendor(lines[17]);
             out.debug("  Quote Num - " + quote.getID());
             out.debug("CustomerNum - " + quote.getCustomerNum());
@@ -79,6 +79,7 @@ public class WSL extends Base {
                 //skip a part that we don't need but is always the same
                 index += 14;
                 if (lines[index].equals("EXT PRICE")) {
+                    index += 2;
                     //we need another two to keep track of the orderlist stuff
                     int[] count2 = {0,0};
                     //true = unit price, false = ext price
@@ -104,13 +105,15 @@ public class WSL extends Base {
                     quote.setTotal(lines[index+=4]);
                     quote.findTax();
                 } else {
-                    // stop when line doesn't match \\d+\\.\\d+\\/[a-z]|[A-X]+
+                    // stop when line doesn't match \\d+\\.\\d+\\/[a-z]|[A-Z]+ or ^$
                 }
                 
+                /*
                 if(quote.getLastOrder().getDesc().isBlank()){
                     quote.removeOrder(quote.getOrders().size()-1);
                     out.debug("Removing that last one");
                 }
+                */
             }
             break;
         }

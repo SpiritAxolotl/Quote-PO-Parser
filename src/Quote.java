@@ -42,7 +42,7 @@ public class Quote extends Base {
         return oldID;
     }
     public int getCustomerNum() {
-        return this.id;
+        return this.custnum;
     }
     public int setCustomerNum(int custnum) {
         int oldNum = this.custnum;
