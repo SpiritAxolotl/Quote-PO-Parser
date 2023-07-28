@@ -3,7 +3,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class Stuff {
+public abstract class Base {
     public int[] intArrayListToArray(ArrayList<Integer> ints) {
         int[] integers = new int[ints.size()];
         for (int i=0; i<ints.size(); i++) {

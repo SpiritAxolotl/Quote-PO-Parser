@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Quote {
+public class Quote extends Base {
     private int id; //quote number
     private int custnum; //customer po number
     private int[] date; //shipping date
@@ -10,7 +10,6 @@ public class Quote {
     private double snh;
     private double tax;
     private double total; //amount due
-    private Stuff s = new Stuff();
     public Quote(int id, int custnum, int[] date, String vendor, ArrayList<Order> orders, double total) {
         this.id = id;
         this.custnum = custnum;
@@ -210,14 +209,14 @@ public class Quote {
                 o.getDesc(),
                 o.getRate(),
                 o.getRateUnit(),
-                "\"" + s.formatDoubleWithCommas(o.getAmount(), false) + "\"",
-                "\"$" + s.formatDoubleWithCommas(this.getTotal(), true) + "\"",
+                "\"" + formatDoubleWithCommas(o.getAmount(), false) + "\"",
+                "\"$" + formatDoubleWithCommas(this.getTotal(), true) + "\"",
                 isBeginning
             };
             if (isBeginning) {
                 isBeginning = false;
-                concat += s.csvCommas(obj);
-            } else concat += "\n" + s.csvCommas(obj);
+                concat += csvCommas(obj);
+            } else concat += "\n" + csvCommas(obj);
         }
         return concat;
     }

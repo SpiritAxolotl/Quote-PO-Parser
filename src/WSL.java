@@ -5,9 +5,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class WSL {
+public class WSL extends Base {
     public Quote readTables(File file, Out out, int type) throws Exception {
-        Stuff s = new Stuff();
         try {
             // Define the WSL command to run
             String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"src/temp.txt\"";
@@ -42,7 +41,7 @@ public class WSL {
             out.println(k + ": " + curr);
         }
         scan.close();
-        String[] lines = s.stringArrayListToArray(linest);
+        String[] lines = stringArrayListToArray(linest);
         int lineSize = lines.length;
         //Parsing the stuff in the java table
         Quote quote = new Quote();
@@ -59,7 +58,7 @@ public class WSL {
             int index = 0;
             //int pages = Integer.parseInt(lines[26].substring(lines[26].length()-1));
             //do this for every page
-            for (int v : s.instancesOf(lines, "Quotation")) {
+            for (int v : instancesOf(lines, "Quotation")) {
                 index = v;
                 while(!lines[index].equals("DESCRIPTION") && index<lineSize) {
                     index++;

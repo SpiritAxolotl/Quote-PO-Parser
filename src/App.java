@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 
-public class App {
+public class App extends Base {
     static File[] dir = (new File("src\\inputs\\extracted\\")).listFiles();
     //static File[] pos = (new File("src\\inputs\\POs")).listFiles();
     //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();

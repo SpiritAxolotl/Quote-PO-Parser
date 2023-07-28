@@ -17,9 +17,8 @@ import technology.tabula.Table;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 //Vendor name, quote date, vendor quote number, our reference, product code, product description, quantity, unit price, total price per line.
-public class Tabula {
+public class Tabula extends Base {
     public PO readTables(File file, Out out) throws Exception {
-        Stuff s = new Stuff();
         if (file.exists()) {
             out.println("File exists!");
             //out.println("Debug: " + file.getPath().substring(file.getPath().indexOf("\\")+1));
@@ -102,7 +101,7 @@ public class Tabula {
             out.debug("       Memo - " + po.getMemo());
             out.debug("      Total - $" + po.getTotal());
         } else if (lineSize <= 88) {
-            for (int i=s.findThing(lines, new int[] {11,1,6})-1; i<=lineSize-12; i+=6) {
+            for (int i=findThing(lines, new int[] {11,1,6})-1; i<=lineSize-12; i+=6) {
                 Order order = new Order(true);
                 order.setDesc(lines.get(i));
                 order.setQuantity(lines.get(i+1));
@@ -132,9 +131,9 @@ public class Tabula {
             System.out.println((test+=2) + " | 1 expected");
             System.out.println((test) + " | 3 expected");
             test+=2;*/
-            int index = s.findThing(lines, new int[] {11,1,6});
+            int index = findThing(lines, new int[] {11,1,6});
             boolean toggle = true;
-            for (int i=index; i<=lineSize-24; i=s.findThing(lines, i)) {
+            for (int i=index; i<=lineSize-24; i=findThing(lines, i)) {
                 Order order = new Order(true);
                 if (toggle) {
                     order.setDesc(lines.get(i++));

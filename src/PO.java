@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class PO {
+public class PO extends Base {
     private int id;
     private int[] date;
     private String vendor;
@@ -194,7 +194,6 @@ public class PO {
     }
     
     public String toCSV() {
-        Stuff s = new Stuff();
         String concat = "";
         boolean isBeginning = true;
         for (Order o : this.orders) {
@@ -203,20 +202,20 @@ public class PO {
                 this.getDateString(),
                 this.getVendor(),
                 o.getDesc(),
-                s.intToString(o.getQuantity()),
-                s.formatDoubleWithCommas(o.getRate(), false),
+                intToString(o.getQuantity()),
+                formatDoubleWithCommas(o.getRate(), false),
                 o.getJob(),
-                s.formatDoubleWithCommas(o.getAmount(), false),
-                s.formatDoubleWithCommas(this.getTotal(), true),
+                formatDoubleWithCommas(o.getAmount(), false),
+                formatDoubleWithCommas(this.getTotal(), true),
                 this.getMemo(),
                 this.getPayTerms(),
                 isBeginning
             };
             if (isBeginning) {
                 isBeginning = false; 
-                concat += s.csvCommas(obj);
+                concat += csvCommas(obj);
             } else {
-                concat += "\n" + s.csvCommas(obj);
+                concat += "\n" + csvCommas(obj);
             }
         }
         return concat;
