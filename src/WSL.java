@@ -48,11 +48,16 @@ public class WSL extends Base {
         switch(type) {
         case 0:
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
-            quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
+            try {
+                out.debug(file.getParentFile().getName());
+                quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                out.debug("parse fail");
+                quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
+            }
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
             quote.setVendor(lines[1]);
             out.debug("  Quote Num - " + quote.getID());
-            //TODO: change to our actual PO number when invalid
             out.debug("CustomerNum - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
