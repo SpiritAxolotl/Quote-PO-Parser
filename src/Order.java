@@ -38,12 +38,12 @@ public class Order extends Base {
     }
     public String setDesc(String desc) {
         String oldDesc = this.desc;
-        this.desc = desc.replaceAll("\uFFFD", "-");
+        this.setDesc(desc.replaceAll("\uFFFD", "-"));
         return oldDesc;
     }
     public String appendDesc(String desc) {
         String oldDesc = this.desc;
-        this.desc += desc.replaceAll("\uFFFD", "-");
+        this.setDesc(oldDesc + desc.replaceAll("\uFFFD", "-"));
         return oldDesc;
     }
     public int getQuantity() {
@@ -68,19 +68,19 @@ public class Order extends Base {
             int i = 1;
             try {
                 for (; i<quantity.length(); i++) {
-                    this.quantity = Integer.parseInt(cleanQty.substring(0,i));
+                    this.setQuantity(Integer.parseInt(cleanQty.substring(0,i)));
                 }
             } catch (NullPointerException | NumberFormatException er) {
                 i--;
-                this.quantity = Integer.parseInt(cleanQty.substring(0,i));
-                this.qtyunit = cleanQty.substring(i);
+                this.setQuantity(Integer.parseInt(cleanQty.substring(0,i)));
+                this.setQtyUnit(cleanQty.substring(i));
             }
         }
         return oldQuantity;
     }
     public String setQtyUnit(String qtyunit) {
         String oldQtyUnit = this.qtyunit;
-        this.qtyunit = qtyunit;
+        this.qtyunit = qtyunit.toLowerCase();
         return oldQtyUnit;
     }
     public double getRate() {
@@ -99,18 +99,18 @@ public class Order extends Base {
         String cleanRate = rate.strip().replaceAll(",", "").replaceAll("\"", "");
         try {
             if (this.type) {
-                this.rate = Double.parseDouble(cleanRate);
+                this.setRate(Double.parseDouble(cleanRate));
             } else {
                 String[] split = cleanRate.split("\\/");
-                this.rate = Double.parseDouble(split[0]);
-                this.rateunit = split[1];
+                this.setRate(Double.parseDouble(split[0]));
+                this.setRateUnit(split[1]);
             }
         } catch (NullPointerException | ArrayIndexOutOfBoundsException | NumberFormatException er) {}
         return oldRate;
     }
     public String setRateUnit(String rateunit) {
         String oldRateUnit = this.rateunit;
-        this.rateunit = rateunit;
+        this.rateunit = rateunit.toLowerCase();
         return oldRateUnit;
     }
     public String getJob() {
@@ -131,8 +131,10 @@ public class Order extends Base {
     }
     public double setAmount(String amount) {
         double oldAmount = this.rate;
-        String cleanAmount = amount.trim().replaceAll(",", "").replaceAll("\"", "");
-        try {this.amount = Double.parseDouble(cleanAmount);} catch (NullPointerException | NumberFormatException er) {}
+        String cleanAmount = amount.strip().replaceAll(",", "").replaceAll("\"", "");
+        try {
+            this.setAmount(Double.parseDouble(cleanAmount));
+        } catch (NullPointerException | NumberFormatException er) {}
         return oldAmount;
     }
     //add another case for the quotes at some point

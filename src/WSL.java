@@ -114,7 +114,7 @@ public class WSL extends Base {
                     quote.setSubtotal(lines[index]);
                     quote.setSNH(lines[index+=4]);
                     quote.setTotal(lines[index+=4]);
-                    quote.findTax();
+                    quote.findSetTax();
                     for(Order order : quote.getOrders()) {
                         out.debug("Description - " + order.getDesc());
                         out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());

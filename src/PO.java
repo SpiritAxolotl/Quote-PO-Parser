@@ -8,17 +8,14 @@ public class PO extends Base {
     private double total;
     private String memo;
     private String payterms;
-    public PO(int id, int[] date, String vendor, ArrayList<Order> orders, double total, String memo, String payterms) {
-        this.id = id;
-        this.date = date;
-        this.vendor = vendor;
-        this.orders = orders;
-        this.total = total;
-        this.memo = memo;
-        this.payterms = payterms;
-    }
     public PO() {
-        this(-1, new int[] {-1,-1,-1}, "", new ArrayList<Order>(), -1, "", "");
+        this.id = -1;
+        this.date = new int[] {-1,-1,-1};
+        this.vendor = "";
+        this.orders = new ArrayList<Order>();
+        this.total = -1;
+        this.memo = "";
+        this.payterms = "";
     }
     
     public int getID() {
@@ -31,7 +28,9 @@ public class PO extends Base {
     }
     public int setID(String id) {
         int oldID = this.id;
-        try {this.id = Integer.parseInt(id);} catch (NullPointerException | NumberFormatException er) {}
+        try {
+            this.setID(Integer.parseInt(id));
+        } catch (NullPointerException | NumberFormatException er) {}
         return oldID;
     }
     public int[] getDate() {
@@ -48,30 +47,32 @@ public class PO extends Base {
         this.date = date;
         return oldDate;
     }
+    public int[] setDate(int index, int num) {
+        //for index: 0 = month, 1 = day, 2 = year
+        int[] oldDate = this.date;
+        this.date[index] = num;
+        return oldDate;
+    }
     public int[] setDate(int month, int day, int year) {
         int[] oldDate = this.date;
-        this.date[0] = month;
-        this.date[1] = day;
-        this.date[2] = year;
+        this.setDate(month, day, year);
         return oldDate;
     }
     public int[] setDate(String[] date) {
         int[] oldDate = this.date;
         int[] newDate = new int[3];
         for (int i=0; i<3; i++) {
-            newDate[i] = Integer.parseInt(date[i]);
+            newDate[i] = Integer.parseInt(date[i].strip());
         }
-        this.date = newDate;
+        this.setDate(newDate);
         return oldDate;
     }
     public int[] setDate(String date) {
         int[] oldDate = this.date;
         String[] newDate = date.split("/");
-        try {
-            this.date[0] = Integer.parseInt(newDate[0]);
-            this.date[1] = Integer.parseInt(newDate[1]);
-            this.date[2] = Integer.parseInt(newDate[2]);
-        } catch (NullPointerException | NumberFormatException er) {}
+        for (int i=0;i<3;i++) { try {
+            this.setDate(i, Integer.parseInt(newDate[i]));
+        } catch (NullPointerException | NumberFormatException er) {}}
         return oldDate;
     }
     public int findSetDate(ArrayList<String> strings) {
@@ -174,7 +175,14 @@ public class PO extends Base {
     }
     public double setTotal(String total) {
         String cleanTotal = total.trim().replaceAll(",", "");
-        return this.setTotal(Double.parseDouble(cleanTotal.substring(cleanTotal.indexOf("$")+1,cleanTotal.length()-1)));
+        return this.setTotal(
+            Double.parseDouble(
+                cleanTotal.substring(
+                    cleanTotal.indexOf("$")+1,
+                    cleanTotal.length()-1
+                )
+            )
+        );
     }
     public String getMemo() {
         return this.memo;

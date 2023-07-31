@@ -34,9 +34,9 @@ public class Quote extends Base {
         int oldID = this.id;
         try {
             if (id.substring(0,1).equals("S")) {
-                this.id = Integer.parseInt(id.substring(1));
+                this.setID(Integer.parseInt(id.substring(1)));
             } else {
-            this.id = Integer.parseInt(id);
+            this.setID(Integer.parseInt(id));
             }
         } catch (NullPointerException | NumberFormatException er) {}
         return oldID;
@@ -52,7 +52,7 @@ public class Quote extends Base {
     public int setCustomerNum(String custnum) {
         int oldNum = this.custnum;
         try {
-            this.custnum = Integer.parseInt(custnum);
+            this.setCustomerNum(Integer.parseInt(custnum.strip()));
         } catch (NullPointerException | NumberFormatException er) {}
         return oldNum;
     }
@@ -143,9 +143,16 @@ public class Quote extends Base {
         this.subtotal = subtotal;
         return oldSubtotal;
     }
-    public double setSNH(String snh) {
-        String cleanSNH = snh.strip().replaceAll(",", "");
-        return this.setSNH(Double.parseDouble(cleanSNH.substring(cleanSNH.indexOf("$")+1,cleanSNH.length()-1)));
+    public double setSubtotal(String subtotal) {
+        String cleanSubtotal = subtotal.strip().replaceAll(",", "");
+        return this.setSubtotal(
+            Double.parseDouble(
+                cleanSubtotal.substring(
+                    cleanSubtotal.indexOf("$")+1,
+                    cleanSubtotal.length()-1
+                )
+            )
+        );
     }
     public double getSNH() {
         return this.snh;
@@ -155,9 +162,16 @@ public class Quote extends Base {
         this.snh = snh;
         return oldSNH;
     }
-    public double setSubtotal(String subtotal) {
-        String cleanSubtotal = subtotal.strip().replaceAll(",", "");
-        return this.setSubtotal(Double.parseDouble(cleanSubtotal.substring(cleanSubtotal.indexOf("$")+1,cleanSubtotal.length()-1)));
+    public double setSNH(String snh) {
+        String cleanSNH = snh.strip().replaceAll(",", "");
+        return this.setSNH(
+            Double.parseDouble(
+                cleanSNH.substring(
+                    cleanSNH.indexOf("$")+1,
+                    cleanSNH.length()-1
+                )
+            )
+        );
     }
     public double getTax() {
         return this.tax;
@@ -167,10 +181,10 @@ public class Quote extends Base {
         this.tax = tax;
         return oldTax;
     }
-    public double findTax() {
+    public double findSetTax() {
         double oldTax = this.tax;
         //if they're invalid there's no fallback yet
-        this.tax = this.getTotal() - this.getSubtotal() - this.getSNH();
+        this.setTax(this.getTotal() - this.getSubtotal() - this.getSNH());
         return oldTax;
     }
     public double getTotal() {
@@ -192,7 +206,14 @@ public class Quote extends Base {
     }
     public double setTotal(String total) {
         String cleanTotal = total.strip().replaceAll(",", "");
-        return this.setTotal(Double.parseDouble(cleanTotal.substring(cleanTotal.indexOf("$")+1,cleanTotal.length()-1)));
+        return this.setTotal(
+            Double.parseDouble(
+                cleanTotal.substring(
+                    cleanTotal.indexOf("$")+1,
+                    cleanTotal.length()-1
+                )
+            )
+        );
     }
     
     public String toCSV() {
