@@ -202,7 +202,6 @@ public class Quote extends Base {
         }
         return -1;
     }
-    //TODO: this
     public double setTotal(String total) {
         String cleanTotal = total.strip().replaceAll(",", "");
         cleanTotal = cleanTotal.substring(cleanTotal.indexOf("$")+1);
