@@ -13,6 +13,7 @@ public class App extends Base {
     static HashMap<Integer, PO> poMap = new HashMap<Integer, PO>();
     static HashMap<Integer, Quote> quoteMap = new HashMap<Integer, Quote>();
     static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
+    static ArrayList<String> filesNotRead = new ArrayList<String>();
     //static ArrayList<PO> poList = new ArrayList<PO>();
     //static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
@@ -72,12 +73,15 @@ public class App extends Base {
                         quotes.add(wsl.readTables(aPDF, out, 0));
                     } else if (match(matchList.get(2), (aPDF.getName()))) {
                         out.println("Matches! Type is 1");
+                        filesNotRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 1));
                     } else if (match(matchList.get(3), (aPDF.getName()))) {
                         out.println("Matches! Type is 2");
+                        filesNotRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 2));
                     } else if (match(matchList.get(4), (aPDF.getName()))) {
                         out.println("Matches! Type is 3");
+                        filesNotRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 3));
                     } else {
                         out.println("File didn't match.\n");
@@ -101,7 +105,11 @@ public class App extends Base {
         for (int id : quoteMap.keySet()) {
             outQuotes.println(quoteMap.get(id).toCSV());
         }
-        
+        out.println("FILES NOT READ:");
+        for (String str : filesNotRead) {
+            out.println(str);
+        }
+        out.println("Program ended successfully!");
         outPOs.close();
         outQuotes.close();
         out.close();
