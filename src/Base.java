@@ -155,7 +155,7 @@ public abstract class Base {
         return concat;
     }
     
-    public String formatDouble(double number) {
+    public static String formatDouble(double number) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         return decimalFormat.format(number);
     }

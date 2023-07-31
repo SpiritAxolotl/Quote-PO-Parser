@@ -7,13 +7,15 @@ import java.util.Scanner;
 
 
 public class App extends Base {
-    static File[] dir = (new File("src\\inputs\\extracted\\")).listFiles();
+    static File[] dir = (new File("src\\inputs\\tempextracted\\")).listFiles();
     //static File[] pos = (new File("src\\inputs\\POs")).listFiles();
     //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
     static HashMap<Integer, PO> poMap = new HashMap<Integer, PO>();
     static HashMap<Integer, Quote> quoteMap = new HashMap<Integer, Quote>();
     static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
     static ArrayList<String> filesNotRead = new ArrayList<String>();
+    static ArrayList<String> filesRead = new ArrayList<String>();
+    static ArrayList<String> filesNotMatched = new ArrayList<String>();
     //static ArrayList<PO> poList = new ArrayList<PO>();
     //static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
@@ -64,12 +66,14 @@ public class App extends Base {
                 out.println("Filepath: \"" + aPDF.getPath() + "\"");
                 if (match(matchList.get(0), (aPDF.getName()))) {
                     out.println("Matches! Type is PO");
+                    filesRead.add(aPDF.getPath());
                     po = t.readTables(aPDF, out);
                     poMap.put(po.getID(), po);
                 } else {
                     boolean a = true;
                     if (match(matchList.get(1), (aPDF.getName()))) {
                         out.println("Matches! Type is 0");
+                        filesRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 0));
                     } else if (match(matchList.get(2), (aPDF.getName()))) {
                         out.println("Matches! Type is 1");
@@ -85,6 +89,9 @@ public class App extends Base {
                         quotes.add(wsl.readTables(aPDF, out, 3));
                     } else {
                         out.println("File didn't match.\n");
+                        if (aPDF.getName().substring(aPDF.getName().length()-3).toLowerCase().equals("pdf")) {
+                            filesNotMatched.add(aPDF.getPath());
+                        }
                         a = false;
                     }
                     if (a) {
@@ -105,11 +112,25 @@ public class App extends Base {
         for (int id : quoteMap.keySet()) {
             outQuotes.println(quoteMap.get(id).toCSV());
         }
-        out.println("FILES NOT READ:");
-        for (String str : filesNotRead) {
-            out.println(str);
+        out.println("FILES READ:");
+        for (String str : filesRead) {
+            out.println("\\" + str);
         }
-        out.println("Program ended successfully!");
+        out.lnprintln("FILES NOT READ:");
+        for (String str : filesNotRead) {
+            out.println("\\" + str);
+        }
+        out.lnprintln("FILES NOT MATCHED:");
+        for (String str : filesNotMatched) {
+            out.println("\\" + str);
+        }
+        int totalFiles = filesRead.size() + filesNotRead.size() + filesNotMatched.size();
+        out.lnprintln("TOTAL READ FILES: " + filesRead.size());
+        out.println("TOTAL NOT READ FILES: " + filesNotRead.size());
+        out.println("TOTAL NOT MATCHED FILES: " + filesNotMatched.size());
+        out.println("TOTAL FILES: " + totalFiles);
+        out.lnprintln("PERCENT OF FILES NOT READ OR MATCHED: " + formatDouble((double)(filesNotRead.size()+filesNotMatched.size())*100.0/totalFiles) + "%");
+        out.lnprintln("Program ended successfully!\n");
         outPOs.close();
         outQuotes.close();
         out.close();
