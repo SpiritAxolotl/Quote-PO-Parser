@@ -225,16 +225,16 @@ public class Quote extends Base {
                 this.getID(),
                 this.getCustomerNum(),
                 this.getDateString(),
-                intToString(o.getQuantity()),
+                o.getQuantity(),
                 o.getQtyUnit(),
                 o.getDesc(),
-                intToString(o.getRate()),
+                o.getRate(),
                 o.getRateUnit(),
-                intToString(o.getAmount()),
-                formatDoubleWithCommas(this.getSubtotal(), false),
-                formatDoubleWithCommas(this.getSNH(), false),
-                formatDoubleWithCommas(this.getTax(), false),
-                formatDoubleWithCommas(this.getTotal(), true),
+                o.getAmount(),
+                this.getSubtotal(),
+                this.getSNH(),
+                this.getTax(),
+                this.getTotal(),
                 isBeginning
             };
             if (isBeginning) {
