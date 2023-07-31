@@ -145,12 +145,10 @@ public class Quote extends Base {
     }
     public double setSubtotal(String subtotal) {
         String cleanSubtotal = subtotal.strip().replaceAll(",", "");
+        cleanSubtotal = cleanSubtotal.substring(cleanSubtotal.indexOf("$")+1);
         return this.setSubtotal(
             Double.parseDouble(
-                cleanSubtotal.substring(
-                    cleanSubtotal.indexOf("$")+1,
-                    cleanSubtotal.length()-1
-                )
+                cleanSubtotal
             )
         );
     }
@@ -204,14 +202,13 @@ public class Quote extends Base {
         }
         return -1;
     }
+    //TODO: this
     public double setTotal(String total) {
         String cleanTotal = total.strip().replaceAll(",", "");
+        cleanTotal = cleanTotal.substring(cleanTotal.indexOf("$")+1);
         return this.setTotal(
             Double.parseDouble(
-                cleanTotal.substring(
-                    cleanTotal.indexOf("$")+1,
-                    cleanTotal.length()-1
-                )
+                cleanTotal
             )
         );
     }

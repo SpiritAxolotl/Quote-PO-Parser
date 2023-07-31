@@ -12,7 +12,7 @@ public class App extends Base {
     //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
     static HashMap<Integer, PO> poMap = new HashMap<Integer, PO>();
     static HashMap<Integer, Quote> quoteMap = new HashMap<Integer, Quote>();
-    //static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
+    static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
     //static ArrayList<PO> poList = new ArrayList<PO>();
     //static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
@@ -53,7 +53,7 @@ public class App extends Base {
         
         Tabula t = new Tabula();
         WSL wsl = new WSL();
-        //int pairID = 0;
+        int pairID = 0;
         //iterate through the files
         for (File folder : dir) {
             PO po = new PO();
@@ -88,14 +88,12 @@ public class App extends Base {
                     }
                 }
             }
-            /*
             try {
                 pairs.put(pairID, new Pair(po, quotes));
                 pairID++;
             } catch (NullPointerException e) {
                 out.println("Error linking PO and Quote. Ignoring for now...");
             }
-            */
         }
         for (int id : poMap.keySet()) {
             outPOs.println(poMap.get(id).toCSV());

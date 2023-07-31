@@ -47,20 +47,36 @@ public class WSL extends Base {
         Quote quote = new Quote();
         switch(type) {
         case 0:
-            quote.setID(lines[findNextValue(lines, findSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
+            quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
             quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
             quote.setVendor(lines[1]);
             out.debug("  Quote Num - " + quote.getID());
+            //TODO: change to our actual PO number when invalid
             out.debug("CustomerNum - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
             int index = 0;
             //int pages = Integer.parseInt(lines[26].substring(lines[26].length()-1));
+            int[] p = instancesOf(lines, "Quotation");
+            int[] pageBounds = new int[p.length];
+            if (p.length > 0) {
+                for (int i=1; i<pageBounds.length; i++) {
+                    pageBounds[i-1] = p[i];
+                }
+                pageBounds[pageBounds.length-1] = lineSize;
+            } else {
+                p = instancesOf(lines, "Acknowledgement");
+                pageBounds = new int[p.length];
+                for (int i=1; i<pageBounds.length; i++) {
+                    pageBounds[i-1] = p[i];
+                }
+                pageBounds[pageBounds.length-1] = lineSize;
+            }
             //do this for every page
-            for (int v : instancesOf(lines, "Quotation")){
-                index = v;
-                while(!(lines[index].equals("DESCRIPTION") || lines[index].equals("EXT PRICE")) && index<lineSize) {
+            for (int pb=0; pb<p.length; pb++){
+                index = p[pb];
+                while(!(lines[index].equals("DESCRIPTION") || lines[index].equals("EXT PRICE")) && index<pageBounds[pb]) {
                     index++;
                 }
                 index += 2;
@@ -74,60 +90,77 @@ public class WSL extends Base {
                     index += 4;
                 }
                 ArrayList<Order> orderlist = new ArrayList<Order>();
-                int count = -1;
-                while(!lines[index].isBlank() && index<lineSize){
+                //keep track of the orders when we get to them
+                int ordercount = -1;
+                //we need another two to keep track of the orderlist stuff
+                int[] ordertrack = {0,0};
+                while(!lines[index].isBlank() && index<pageBounds[pb]){
                     int sep = lines[index].indexOf(" ");
-                    if(sep != -1 && lines[index].substring(0, sep).matches("\\d+[a-zA-Z]{1,3}")){
-                        count++;
+                    if(sep != -1 && lines[index].substring(0, sep).matches("\\d+[a-zA-Z]{1,3}") && !lines[index].toLowerCase().matches("\\d+ft reel")){
+                        ordercount++;
                         orderlist.add(new Order(false));
-                        orderlist.get(count).setDesc(lines[index].substring(sep+1));
-                        orderlist.get(count).setQuantity(lines[index].substring(0, sep));
+                        orderlist.get(ordercount).setDesc(lines[index].substring(sep+1));
+                        orderlist.get(ordercount).setQuantity(lines[index].substring(0, sep));
                     } else {
-                        orderlist.get(count).appendDesc(" | " + lines[index]);
+                        orderlist.get(ordercount).appendDesc(" | " + lines[index]);
                     }
                     index++;
                 }
                 //skip a part that we don't need but is always the same
-                index += 14;
-                if (lines[index].equals("EXT PRICE")) {
-                    index += 2;
-                    //we need another two to keep track of the orderlist stuff
-                    int[] count2 = {0,0};
-                    //true = unit price, false = ext price
-                    boolean toggle = true;
-                    while(!lines[index].equals("Subtotal") && index<lineSize) {
-                        if(lines[index].isBlank()){
-                            toggle = !toggle;
-                        } else if (toggle){
-                            orderlist.get(count2[0]).setRate(lines[index]);
-                            count2[0]++;
-                        } else {
-                            orderlist.get(count2[1]).setAmount(lines[index]);
-                            count2[1]++;
+                //nvm it is not always the same
+                while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?") && index<pageBounds[pb]) {
+                    index++;
+                }
+                //if (lines[index-2].equals("EXT PRICE")) {
+                //true = unit price, false = ext price
+                boolean toggle = true;
+                //true = alt format (rare), false = main format
+                boolean alt = !lines[index-2].equals("EXT PRICE");
+                while(index<pageBounds[pb]) {
+                    if(lines[index].isBlank()) {
+                        toggle = !toggle;
+                        if (alt && !toggle) {
+                            index += 4;
+                        } else if (alt) {
+                            index++;
+                            break;
                         }
+                    } else if (lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?")) {
+                        if (toggle) {
+                            orderlist.get(ordertrack[0]).setRate(lines[index]);
+                            ordertrack[0]++;
+                        } else {
+                            orderlist.get(ordertrack[1]).setAmount(lines[index]);
+                            ordertrack[1]++;
+                        }
+                    } else {
+                        break;
+                    }
+                    index++;
+                }
+                /*} else {
+                    while (!(lines[index].matches("\\d+\\.\\d+\\/[a-zA-Z]+") || lines[index].equals(""))) {
+                        orderlist.get(ordertrack).setRate(lines[index]);
+                        ordertrack[0]++;
                         index++;
                     }
-                    quote.addOrders(orderlist);
-                    while(lines[index].equals("Subtotal") && index<lineSize) {
-                        index += 2;
+                    index = findThing(lines, findSpecificThing(lines, "EXT PRICE", index)+1);
+                    ordertrack = 0;
+                    while (!(lines[index].matches("\\d+\\.\\d+") || lines[index].equals(""))) {
+                        orderlist.get(ordertrack).setAmount(lines[index]);
+                        ordertrack[1]++;
+                        index++;
                     }
-                    quote.setSubtotal(lines[index]);
-                    quote.setSNH(lines[index+=4]);
-                    quote.setTotal(lines[index+=4]);
-                    quote.findSetTax();
-                    for(Order order : quote.getOrders()) {
-                        out.debug("Description - " + order.getDesc());
-                        out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
-                        out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
-                        out.debug("  Ext Price - " + order.getAmount());
-                    }
-                    out.debug("   Subtotal - " + quote.getSubtotal());
-                    out.debug("        S&H - " + quote.getSNH());
-                    out.debug("        Tax - " + quote.getTax());
-                    out.debug("      Total - " + quote.getTotal());
-                } else {
-                    // TODO: stop when line doesn't match \\d+\\.\\d+\\/[a-z]|[A-Z]+ or ^$
-                    out.println("TODO: FIX THIS CASE SOON");
+                }*/
+                quote.addOrders(orderlist);
+                while(lines[index].equals("Subtotal") && index<pageBounds[pb]) {
+                    index += 2;
+                }
+                for(Order order : quote.getOrders()) {
+                    out.debug("Description - " + order.getDesc());
+                    out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
+                    out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
+                    out.debug("  Ext Price - " + order.getAmount());
                 }
                 /*
                 if(quote.getLastOrder().getDesc().isBlank()){
@@ -136,6 +169,14 @@ public class WSL extends Base {
                 }
                 */
             }
+            quote.setSubtotal(lines[index]);
+            quote.setSNH(lines[index=findThing(lines, findSpecificThing(lines, "S&H Charges", index)+1)]);
+            quote.setTotal(lines[index=findThing(lines, findSpecificThing(lines, "Amount Due", index)+1)]);
+            quote.findSetTax();
+            out.debug("   Subtotal - " + quote.getSubtotal());
+            out.debug("        S&H - " + quote.getSNH());
+            out.debug("        Tax - " + quote.getTax());
+            out.debug("      Total - " + quote.getTotal());
             break;
         }
         out.println();

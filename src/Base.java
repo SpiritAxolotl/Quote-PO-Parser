@@ -65,57 +65,62 @@ public abstract class Base {
         return -1;
     }
     
-    public int findThing(ArrayList<String> strings, int index) {
-        for(int i=index; i<strings.size(); i++) {
-            if (!strings.get(i).isBlank()) {
+    public int findThing(String[] strings, int index) {
+        for(int i=index; i<strings.length; i++) {
+            if (!strings[i].isBlank()) {
                 return i;
             }
         }
         return -1;
     }
-    
-    public int findThing(ArrayList<String> strings, int[] indexes) {
+    public int findThing(String[] strings) {
+        return findThing(strings, 0);
+    }
+    public int findThing(String[] strings, int[] indexes) {
         int index = 0;
         for(int i=0; i<indexes.length; i++) {
-            index = findThing(strings, index + indexes[i]) + 1;
+            int thing = findThing(strings, index + indexes[i]);
+            if (thing < 0) {
+                return -1;
+            }
+            index = thing + 1;
         }
         return index - 1;
     }
+    public int findThing(ArrayList<String> strings) {
+        return findThing(stringArrayListToArray(strings));
+    }
+    public int findThing(ArrayList<String> strings, int index) {
+        return findThing(stringArrayListToArray(strings), index);
+    }
+    public int findThing(ArrayList<String> strings, int[] indexes) {
+        return findThing(stringArrayListToArray(strings), indexes);
+    }
     
-    public int findSpecificThing(String[] strings, String target) {
-        for(int i=0; i<strings.length; i++) {
+    public int findSpecificThing(String[] strings, String target, int index) {
+        for(int i=index; i<strings.length; i++) {
             if (strings[i].equals(target)) {
                 return i;
             }
         }
         return -1;
     }
-    
-    public int findSpecificThing(String[] strings, String target, String target2) {
-        for(int i=0; i<strings.length; i++) {
-            if (strings[i].equals(target) || strings[i].equals(target2)) {
-                return i;
-            }
-        }
-        return -1;
+    public int findSpecificThing(String[] strings, String target) {
+        return findSpecificThing(strings, target, 0);
     }
-    
+    public int findTwoSpecificThing(String[] strings, String target, String target2) {
+        int a = findSpecificThing(strings, target);
+        int b = findSpecificThing(strings, target2);
+        return getMinPositiveValue(a,b);
+    }
     public int findSpecificThing(ArrayList<String> strings, String target) {
-        for(int i=0; i<strings.size(); i++) {
-            if (strings.get(i).equals(target)) {
-                return i;
-            }
-        }
-        return -1;
+        return findSpecificThing(stringArrayListToArray(strings), target);
     }
-    
     public int findSpecificThing(ArrayList<String> strings, String target, int index) {
-        for(int i=index; i<strings.size(); i++) {
-            if (strings.get(i).equals(target)) {
-                return i;
-            }
-        }
-        return -1;
+        return findSpecificThing(stringArrayListToArray(strings), target, index);
+    }
+    public int findTwoSpecificThing(ArrayList<String> strings, String target, String target2) {
+        return findTwoSpecificThing(stringArrayListToArray(strings), target, target2);
     }
     
     public String intToString(double num) {
@@ -164,6 +169,9 @@ public abstract class Base {
         if (text.contains(",") || text.contains("\"")) {
             text = "\"" + text.replaceAll("\"", "\"\"") + "\"";
         }
+        if (text.equals("-1") || text.equals("-1.0")) {
+            text = "";
+        }
         return text;
     }
     
@@ -181,5 +189,27 @@ public abstract class Base {
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(match);
         return m.matches();
+    }
+    
+    public static boolean isValid(int num) {
+        return num < 0;
+    }
+    public static boolean isValid(double num) {
+        return num < 0.0;
+    }
+    public static boolean isValid(String str) {
+        return str.strip().equals("");
+    }
+    
+    public static int getMinPositiveValue(int value1, int value2) {
+        if (value1 >= 0 && value2 >= 0) {
+            return Math.min(value1, value2);
+        } else if (value1 < 0 && value2 >= 0) {
+            return value2;
+        } else if (value1 >= 0 && value2 < 0) {
+            return value1;
+        } else {
+            return -1;
+        }
     }
 }
