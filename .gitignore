@@ -3,5 +3,5 @@
 **/inputs/**
 **/outputs/**
 temp.txt
-.vscode/**
-.vscode/launch.json
+/.vscode/**
+/.vscode/launch.json
