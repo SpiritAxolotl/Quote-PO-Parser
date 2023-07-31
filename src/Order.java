@@ -38,7 +38,7 @@ public class Order extends Base {
     }
     public String setDesc(String desc) {
         String oldDesc = this.desc;
-        this.setDesc(desc.replaceAll("\uFFFD", "-"));
+        this.desc = desc.replaceAll("\uFFFD", "-");
         return oldDesc;
     }
     public String appendDesc(String desc) {
