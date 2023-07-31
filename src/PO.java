@@ -102,11 +102,14 @@ public class PO extends Base {
         this.vendor = vendor;
         return oldVendor;
     }
-    public Order getOrder() {
-        return this.orders.get(0);
-    }
     public Order getOrder(int num) {
         return this.orders.get(num);
+    }
+    public Order getOrder() {
+        return this.getOrder(0);
+    }
+    public Order getLastOrder() {
+        return this.getOrder(this.orders.size()-1);
     }
     public Order[] getOrdersArray() {
         Order[] orders = new Order[this.orders.size()];
@@ -114,9 +117,6 @@ public class PO extends Base {
             orders[i] = this.orders.get(i);
         }
         return orders;
-    }
-    public Order getLastOrder() {
-        return this.orders.get(this.orders.size()-1);
     }
     public ArrayList<Order> getOrders() {
         return this.orders;
