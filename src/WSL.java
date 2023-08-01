@@ -107,7 +107,7 @@ public class WSL extends Base {
                         orderlist.get(ordercount).setDesc(lines[index].substring(sep+1));
                         orderlist.get(ordercount).setQuantity(lines[index].substring(0, sep));
                     } else {
-                        orderlist.get(ordercount).appendDesc(" | " + lines[index]);
+                        orderlist.get(ordercount).appendDesc(" " + lines[index]);
                     }
                     index++;
                 }
