@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 
 public class App extends Base {
-    static File[] dir = (new File("src\\inputs\\tempextracted\\")).listFiles();
+    static File[] dir = (new File("src\\inputs\\extracted\\")).listFiles();
     //static File[] pos = (new File("src\\inputs\\POs")).listFiles();
     //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
     static HashMap<Integer, PO> poMap = new HashMap<Integer, PO>();

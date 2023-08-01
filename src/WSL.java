@@ -63,21 +63,12 @@ public class WSL extends Base {
             out.debug("     Vendor - " + quote.getVendor());
             int index = 0;
             //int pages = Integer.parseInt(lines[26].substring(lines[26].length()-1));
-            int[] p = instancesOf(lines, "Quotation");
+            int[] p = instancesOf(lines, lines[0]);
             int[] pageBounds = new int[p.length];
-            if (p.length > 0) {
-                for (int i=1; i<pageBounds.length; i++) {
-                    pageBounds[i-1] = p[i];
-                }
-                pageBounds[pageBounds.length-1] = lineSize;
-            } else {
-                p = instancesOf(lines, "Acknowledgement");
-                pageBounds = new int[p.length];
-                for (int i=1; i<pageBounds.length; i++) {
-                    pageBounds[i-1] = p[i];
-                }
-                pageBounds[pageBounds.length-1] = lineSize;
+            for (int i=1; i<pageBounds.length; i++) {
+                pageBounds[i-1] = p[i];
             }
+            pageBounds[pageBounds.length-1] = lineSize;
             //do this for every page
             for (int pb=0; pb<p.length; pb++){
                 index = p[pb];
@@ -113,19 +104,29 @@ public class WSL extends Base {
                 }
                 //skip a part that we don't need but is always the same
                 //nvm it is not always the same
-                while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?") && index<pageBounds[pb]) {
+                /*while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?") && index<pageBounds[pb]) {
+                    index++;
+                }*/
+                while(!lines[index].matches("UNIT PRICE") && index<pageBounds[pb]) {
                     index++;
                 }
+                index++;
+                
                 //if (lines[index-2].equals("EXT PRICE")) {
                 //true = unit price, false = ext price
                 boolean toggle = true;
                 //true = alt format (rare), false = main format
+                //change this in the future:
                 boolean alt = !lines[index-2].equals("EXT PRICE");
                 while(index<pageBounds[pb]) {
                     if(lines[index].isBlank()) {
                         toggle = !toggle;
                         if (alt && !toggle) {
-                            index += 4;
+                            while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?") && index<pageBounds[pb]) {
+                                index++;
+                            }
+                            //index += 4;
+                            continue;
                         } else if (alt) {
                             index++;
                             break;
