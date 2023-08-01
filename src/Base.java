@@ -160,11 +160,6 @@ public abstract class Base {
         return decimalFormat.format(number);
     }
     
-    //note that this doesn't FULLY sanitize the entire input
-    //it will get f'd up if there are single doublequotes
-    //and I pray none of the inputs have them
-    //(but if they do it will be obvious when it happens)
-    //update: it was obvious when it happened. fixing now...
     public String inputSanitizer(String text) {
         if (text.contains(",") || text.contains("\"")) {
             text = "\"" + text.replaceAll("\"", "\"\"") + "\"";
@@ -211,5 +206,37 @@ public abstract class Base {
         } else {
             return -1;
         }
+    }
+    
+    public static String removeAsteriskContent(String input) {
+        // Regular expression pattern to match three or four asterisks in a row
+        String asteriskPattern = "\\*{2,5}";
+        
+        // Compile the pattern into a regex object
+        Pattern pattern = Pattern.compile(asteriskPattern);
+        
+        // Create a matcher to find matches in the input string
+        Matcher matcher = pattern.matcher(input);
+        
+        // Use StringBuffer for efficient string manipulation
+        StringBuffer sb = new StringBuffer();
+        
+        // Start index for the next match
+        int startIndex = 0;
+        
+        // Iterate through matches
+        while (matcher.find()) {
+            // Append the content before the match to the result buffer
+            sb.append(input.substring(startIndex, matcher.start()));
+            
+            // Update the start index for the next match
+            startIndex = matcher.end();
+        }
+        
+        // Append the remaining content after the last match to the result buffer
+        sb.append(input.substring(startIndex));
+        
+        // Convert the StringBuffer back to a String
+        return sb.toString();
     }
 }

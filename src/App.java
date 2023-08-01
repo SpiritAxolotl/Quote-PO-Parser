@@ -8,16 +8,12 @@ import java.util.Scanner;
 
 public class App extends Base {
     static File[] dir = (new File("src\\inputs\\extracted\\")).listFiles();
-    //static File[] pos = (new File("src\\inputs\\POs")).listFiles();
-    //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
     static HashMap<Integer, PO> poMap = new HashMap<Integer, PO>();
     static HashMap<Integer, Quote> quoteMap = new HashMap<Integer, Quote>();
     static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
     static ArrayList<String> filesNotRead = new ArrayList<String>();
     static ArrayList<String> filesRead = new ArrayList<String>();
     static ArrayList<String> filesNotMatched = new ArrayList<String>();
-    //static ArrayList<PO> poList = new ArrayList<PO>();
-    //static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     
     public String[] findSuppliesPO(int id){
         PO po = poMap.get(id);
@@ -44,7 +40,7 @@ public class App extends Base {
         PrintWriter outPOs = new PrintWriter("src\\outputs\\POs.csv");
         PrintWriter outQuotes = new PrintWriter("src\\outputs\\Quotes.csv");
         outPOs.println("ID,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Tracker");
-        outQuotes.println("Vendor Name,Quote Number,Customer Number,Ship Date,Qty,Qty Unit,Description,Unit Price,UoM,Ext Price,Subtotal,S&H,Tax,Total,Tracker");
+        outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total,Tracker");
         File temp = new File("src\\temp.txt");
         temp.deleteOnExit();
         ArrayList<String> matchList = new ArrayList<String>();
@@ -96,6 +92,7 @@ public class App extends Base {
                     }
                     if (a) {
                         quoteMap.put(quotes.get(quotes.size()-1).getID(), quotes.get(quotes.size()-1));
+                        wsl.clear();
                     }
                 }
             }

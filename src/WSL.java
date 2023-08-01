@@ -6,6 +6,30 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class WSL extends Base {
+    private String[] lines;
+    private Quote quote;
+    private boolean[] pricepattern;
+    private int index;
+    public void clear() {
+        lines = null;
+        quote = null;
+        pricepattern = null;
+        index = 0;
+    }
+    public int incrementIndexLog(int index) {
+        if(lines[index].equals("UNIT PRICE")){
+                    index += 2;
+                    pricepattern[0] = true;
+                }
+                if(lines[index].equals("EXT PRICE")){
+                    index += 2;
+                    pricepattern[1] = true;
+                }
+                if(lines[index].equals("SHIPPING INSTRUCTIONS")){
+                    index += 4;
+                }
+        return index + 1;
+    }
     public Quote readTables(File file, Out out, int type) throws Exception {
         try {
             // Define the WSL command to run
@@ -22,8 +46,7 @@ public class WSL extends Base {
             
             // Read the output of the process
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
+            for (String line; (line = reader.readLine()) != null;) {
                 out.println(line);
             }
             
@@ -36,15 +59,15 @@ public class WSL extends Base {
         Scanner scan = new Scanner(new File("src\\temp.txt"));
         ArrayList<String> linest = new ArrayList<String>();
         for (int k=0; scan.hasNextLine(); k++) {
-            String curr = scan.nextLine().strip();
-            linest.add(curr);
-            out.println(k + ": " + curr);
+            String line = scan.nextLine().strip();
+            linest.add(line);
+            out.println(k + ": " + line);
         }
         scan.close();
-        String[] lines = stringArrayListToArray(linest);
+        lines = stringArrayListToArray(linest);
         int lineSize = lines.length;
         //Parsing the stuff in the java table
-        Quote quote = new Quote();
+        quote = new Quote();
         switch(type) {
         case 0:
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
@@ -61,7 +84,7 @@ public class WSL extends Base {
             out.debug("CustomerNum - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
-            int index = 0;
+            //index = 0;
             //int pages = Integer.parseInt(lines[26].substring(lines[26].length()-1));
             int[] p = instancesOf(lines, lines[0]);
             int[] pageBounds = new int[p.length];
@@ -76,15 +99,8 @@ public class WSL extends Base {
                     index++;
                 }
                 index += 2;
-                if(lines[index].equals("UNIT PRICE")){
-                    index += 2;
-                }
-                if(lines[index].equals("EXT PRICE")){
-                    index += 2;
-                }
-                if(lines[index].equals("SHIPPING INSTRUCTIONS")){
-                    index += 4;
-                }
+                pricepattern = new boolean[] {false, false};
+                
                 ArrayList<Order> orderlist = new ArrayList<Order>();
                 //keep track of the orders when we get to them
                 int ordercount = -1;
@@ -92,7 +108,14 @@ public class WSL extends Base {
                 int[] ordertrack = {0,0};
                 while(!lines[index].isBlank() && index<pageBounds[pb]){
                     int sep = lines[index].indexOf(" ");
-                    if(sep != -1 && lines[index].substring(0, sep).matches("\\d+[a-zA-Z]{1,3}") && !lines[index].toLowerCase().matches("\\d+ft reel")){
+                    if (lines[index].matches("\\*+")) {
+                        index++;
+                        while(!lines[index].matches("\\*+")) {
+                            index++;
+                        }
+                    } else if (lines[index].indexOf("*")==1 && lines[index].lastIndexOf("*")==lines[index].length()-1) {
+                        index++;
+                    } else if (sep != -1 && lines[index].substring(0, sep).matches("\\d+[a-zA-Z]{1,3}") && !lines[index].toLowerCase().matches("\\d+ft reel")){
                         ordercount++;
                         orderlist.add(new Order(false));
                         orderlist.get(ordercount).setDesc(lines[index].substring(sep+1));
@@ -122,7 +145,7 @@ public class WSL extends Base {
                     if(lines[index].isBlank()) {
                         toggle = !toggle;
                         if (alt && !toggle) {
-                            while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?") && index<pageBounds[pb]) {
+                            while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?")) {
                                 index++;
                             }
                             //index += 4;

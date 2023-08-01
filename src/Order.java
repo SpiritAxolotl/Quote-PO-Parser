@@ -38,12 +38,13 @@ public class Order extends Base {
     }
     public String setDesc(String desc) {
         String oldDesc = this.desc;
-        this.desc = desc.replaceAll("\uFFFD", "-");
+        String cleanDesc = desc.replaceAll("\uFFFD", "-");
+        this.desc = removeAsteriskContent(cleanDesc);
         return oldDesc;
     }
     public String appendDesc(String desc) {
         String oldDesc = this.desc;
-        this.setDesc(oldDesc + desc.replaceAll("\uFFFD", "-"));
+        this.setDesc(oldDesc + desc);
         return oldDesc;
     }
     public int getQuantity() {
@@ -62,7 +63,7 @@ public class Order extends Base {
         String cleanQty = quantity.strip().replaceAll(",","");
         if (this.type) {
             try {
-                this.quantity = Integer.parseInt(cleanQty);
+                this.setQuantity(Integer.parseInt(cleanQty));
             } catch (NullPointerException | NumberFormatException er) {}
         } else {
             int i = 1;
@@ -110,7 +111,7 @@ public class Order extends Base {
     }
     public String setRateUnit(String rateunit) {
         String oldRateUnit = this.rateunit;
-        this.rateunit = rateunit.toLowerCase();
+        this.rateunit = rateunit.toUpperCase();
         return oldRateUnit;
     }
     public String getJob() {

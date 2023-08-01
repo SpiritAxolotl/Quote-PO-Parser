@@ -227,7 +227,7 @@ public class Quote extends Base {
                 o.getRate(),
                 o.getRateUnit(),
                 o.getAmount(),
-                this.getSubtotal(),
+                //this.getSubtotal(),
                 this.getSNH(),
                 this.getTax(),
                 this.getTotal(),
