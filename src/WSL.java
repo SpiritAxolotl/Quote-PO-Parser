@@ -131,20 +131,29 @@ public class WSL extends Base {
                 /*while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?") && index<pageBounds[pb]) {
                     index++;
                 }*/
+                int oldindex = index;
                 while(!lines[index].matches("UNIT PRICE") && index<pageBounds[pb]) {
                     index++;
+                }
+                if (index >= pageBounds[pb]) {
+                    index = oldindex;
+                    while (!lines[index].contains("Printed By: ")) {
+                        index++;
+                    }
                 }
                 index += 2;
                 
                 //if (lines[index-2].equals("EXT PRICE")) {
                 //true = unit price, false = ext price
                 boolean toggle = true;
-                //true = alt format (rare), false = main format
+                //false = alt format (rare), true = main format
                 //change this in the future:
                 boolean alt = false;
                 if (lines[index].equals("EXT PRICE")) {
                     alt = true;
                     index += 2;
+                } else if (lines[index-2].contains("Printed By: ")) {
+                    alt = true;
                 }
                 int snhline = findSpecificThing(lines, "S&H Charges", index)-2;
                 while(index<pageBounds[pb] && index<snhline) {
