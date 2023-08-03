@@ -17,70 +17,15 @@ import technology.tabula.Table;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 //Vendor name, quote date, vendor quote number, our reference, product code, product description, quantity, unit price, total price per line.
-public class Tabula {
-    private PO po;
-    private Quote quote;
-    public PO readTablesPO(File file, Out out) throws Exception {
-        this.readTables(file, out, 0);
-        return this.po;
-    }
-    public Quote readTablesQuote(File file, Out out, int type) throws Exception {
-        this.readTables(file, out, type);
-        return this.quote;
-    }
-    public static int[] intArrayListToArray(ArrayList<Integer> ints) {
-        int[] integers = new int[ints.size()];
-        for (int i=0; i<ints.size(); i++) {
-            integers[i] = ints.get(i);
-        }
-        return integers;
-    }
-    public static ArrayList<Integer> intArrayToArrayList(int[] ints) {
-        ArrayList<Integer> integers = new ArrayList<Integer>();
-        for (int i : ints) {
-            integers.add(i);
-        }
-        return integers;
-    }
-    public int findThing(ArrayList<String> strings, int index) {
-        for(int i=index; i<strings.size(); i++) {
-            if (!strings.get(i).isBlank()) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    public int findThing(ArrayList<String> strings, int[] indexes) {
-        int index = 0;
-        for(int i=0; i<indexes.length; i++) {
-            index = findThing(strings, index + indexes[i]);
-        }
-        return index;
-    }
-    public int findSpecificThing(ArrayList<String> strings, String target) {
-        for(int i=0; i<strings.size(); i++) {
-            if (strings.get(i).equals(target)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    public int findSpecificThing(ArrayList<String> strings, String target, int index) {
-        for(int i=index; i<strings.size(); i++) {
-            if (strings.get(i).equals(target)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    //mostly written by someone else:
-    private void readTables(File file, Out out, int type) throws Exception {
+public class Tabula extends Base {
+    public PO readTables(File file, Out out) throws Exception {
         if (file.exists()) {
             out.println("File exists!");
             //out.println("Debug: " + file.getPath().substring(file.getPath().indexOf("\\")+1));
         } else {
             out.println("File doesn't exist :(");
         }
+        //written by not me
         InputStream in = this.getClass().getClassLoader().getResourceAsStream(file.getPath().substring(file.getPath().indexOf("\\")+1));
         PrintWriter pw = new PrintWriter("src\\temp.txt");
         //extract tables from document
@@ -95,13 +40,12 @@ public class Tabula {
                 // iterate over the tables of the page
                 int i = 0;
                 for (Table table : tables) {
-                    @SuppressWarnings("rawtypes") List<List<RectangularTextContainer>> rows = table.getRows();
                     // iterate over the rows of the table
-                    for (@SuppressWarnings("rawtypes") List<RectangularTextContainer> cells : rows) {
+                    for (@SuppressWarnings("rawtypes") List<RectangularTextContainer> cells : table.getRows()) {
                         // print all column-cells of the row plus linefeed
                         for (@SuppressWarnings("rawtypes") RectangularTextContainer content : cells) {
                             // Note: Cell.getText() uses \r to concat text chunks
-                            String text = content.getText().replaceAll("\r", " ");
+                            String text = content.getText().replaceAll("\r", " ").strip();
                             pw.println(text);
                             out.println(i + ": " + text);
                             //poList.add(new PO());
@@ -119,128 +63,110 @@ public class Tabula {
         //all of this is davey's code:
         //Putting the inputs into a table
         Scanner scan = new Scanner(new File("src\\temp.txt"));
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> linest = new ArrayList<String>();
         while (scan.hasNextLine()) {
-            lines.add(scan.nextLine().trim());
+            linest.add(scan.nextLine().trim());
         }
         scan.close();
-        int lineSize = lines.size();
+        String[] lines = stringArrayListToArray(linest);
+        int lineSize = lines.length;
         //Parsing the stuff in the java table
         //Quote quote = new Quote();
-        switch (type) {
-        case 0:
-            PO po = new PO();
-            po.setID(lines.get(5));
-            po.setDate(lines.get(4));
-            po.setVendor(lines.get(7));
-            po.setPayTerms(lines.get(3));
-            out.debug("         ID - " + po.getID());
-            out.debug("       Date - " + po.getDateString());
-            out.debug("     Vendor - " + po.getVendor());
-            out.debug("  Pay Terms - " + po.getPayTerms());
-            po.setMemo(lines.get(po.findSetTotal(lines)-1));
-            if (lineSize <= 40) {
+        PO po = new PO();
+        po.setID(lines[5]);
+        po.setDate(lines[4]);
+        po.setVendor(lines[7]);
+        po.setPayTerms(lines[3]);
+        out.debug("         ID - " + po.getID());
+        out.debug("       Date - " + po.getDateString());
+        out.debug("     Vendor - " + po.getVendor());
+        out.debug("  Pay Terms - " + po.getPayTerms());
+        po.setMemo(lines[po.findSetTotal(lines)-1]);
+        if (lineSize <= 40) {
+            Order order = new Order(true);
+            order.setDesc(lines[28]);
+            order.setQuantity(lines[29]);
+            order.setRate(lines[30]);
+            order.setJob(lines[31]);
+            order.setAmount(lines[33]);
+            po.addOrder(order.isValid(out));
+            out.debug("Description - " + order.getDesc());
+            out.debug("   Quantity - " + order.getQuantity());
+            out.debug("       Rate - " + order.getRate());
+            out.debug("        Job - " + order.getJob());
+            out.debug("     Amount - " + order.getAmount());
+            if(po.getLastOrder().getDesc().isBlank()){
+                po.removeOrder(po.getOrders().size()-1);
+                out.debug("Removing that last one");
+            }
+            out.debug("       Memo - " + po.getMemo());
+            out.debug("      Total - $" + po.getTotal());
+        } else if (lineSize <= 88 && po.getID() != 7144) {
+            for (int i=findThing(lines, findSpecificThing(lines, "Amount")+1); i<=lineSize-12; i+=6) {
                 Order order = new Order(true);
-                order.setDesc(lines.get(28));
-                order.setQuantity(lines.get(29));
-                order.setRate(lines.get(30));
-                order.setJob(lines.get(31));
-                order.setAmount(lines.get(33));
-                po.addOrder(order.isValid(out));
+                order.setDesc(lines[i]);
+                order.setQuantity(lines[i+1]);
+                order.setRate(lines[i+2]);
+                order.setJob(lines[i+3]);
+                order.setAmount(lines[i+5]);
                 out.debug("Description - " + order.getDesc());
                 out.debug("   Quantity - " + order.getQuantity());
                 out.debug("       Rate - " + order.getRate());
                 out.debug("        Job - " + order.getJob());
                 out.debug("     Amount - " + order.getAmount());
-                if(po.getLastOrder().getDesc().isBlank()){
-                    po.removeOrder(po.getOrders().size()-1);
-                    out.debug("Removing that last one");
+                if(!order.getDesc().isBlank()){
+                    po.addOrder(order.isValid(out));
+                } else {
+                    out.debug("Removing that last one...");
                 }
-            } else if (lineSize <= 51) {
-                //findThing(lines, 11);
-                for (int i=findThing(lines, new int[] {11,1,6})+1; i<=lineSize-12; i+=6) {
-                    Order order = new Order(true);
-                    order.setDesc(lines.get(i));
-                    order.setQuantity(lines.get(i+1));
-                    order.setRate(lines.get(i+2));
-                    order.setJob(lines.get(i+3));
-                    order.setAmount(lines.get(i+5));
-                    out.debug("Description - " + order.getDesc());
-                    out.debug("   Quantity - " + order.getQuantity());
-                    out.debug("       Rate - " + order.getRate());
-                    out.debug("        Job - " + order.getJob());
-                    out.debug("     Amount - " + order.getAmount());
-                    if(!order.getDesc().isBlank()){
-                        po.addOrder(order.isValid(out));
-                    }
-                }
-                out.debug("       Memo - " + po.getMemo());
-                out.debug("      Total - $" + po.getTotal());
-                /*
-                if(po.getLastOrder().getDesc().isBlank()){
-                    po.removeOrder(po.getOrders().size()-1);
-                }
-                */
-            } else {
-                int index = findThing(lines,findThing(lines,findThing(lines,11)+1)+6);
-                Order ordertemp = new Order(true);
-                ordertemp.setDesc(lines.get(index));
-                ordertemp.setQuantity(lines.get(index+1));
-                ordertemp.setRate(lines.get(index+2));
-                ordertemp.setJob(lines.get(index+3));
-                ordertemp.setAmount(lines.get(index+4));
-                po.addOrder(ordertemp.isValid(out));
-                for (int i=index+5; i<=lineSize-24; i+=12) {
-                    Order order = new Order(true);
-                    order.setDesc(lines.get(i));
-                    order.setQuantity(lines.get(i+2));
-                    order.setRate(lines.get(i+4));
-                    order.setJob(lines.get(i+6));
-                    order.setAmount(lines.get(i+8));
-                    out.debug("Description - " + order.getDesc());
-                    out.debug("   Quantity - " + order.getQuantity());
-                    out.debug("       Rate - " + order.getRate());
-                    out.debug("        Job - " + order.getJob());
-                    out.debug("     Amount - " + order.getAmount());
-                    if(!order.getDesc().isBlank()){
-                        po.addOrder(order.isValid(out));
-                    }
-                }
-                out.debug("       Memo - " + po.getMemo());
-                out.debug("      Total - $" + po.getTotal());
             }
-            this.po = po.isValid(out);
-            break;
-        //uncomment and modify when I start working on quotes
-        /*case 1:
-            quote.setID(lines.get(14));
-            quote.setDate(lines.get(2));
-            quote.setVendor(lines.get(4));
-            quote.setRef(lines.get(3));
-            out.debug("ID - " + quote.getID());
-            out.debug("Date - " + quote.getDateString());
-            out.debug("Vendor - " + quote.getVendor());
-            out.debug("Ref - " + quote.getRef());
-            quote.setRef(lines.get(8));
-            for (int i=28; i<=lineSize-12; i+=6) {
+            out.debug("       Memo - " + po.getMemo());
+            out.debug("      Total - $" + po.getTotal());
+            /*
+            if(po.getLastOrder().getDesc().isBlank()){
+                po.removeOrder(po.getOrders().size()-1);
+            }
+            */
+        } else {
+            /*int test = 0;
+            System.out.println(test + " | 0 expected");
+            System.out.println((test++) + " | 0 expected");
+            System.out.println((test+=2) + " | 1 expected");
+            System.out.println((test) + " | 3 expected");
+            test+=2;*/
+            int index = findThing(lines, new int[] {11,1,6});
+            boolean toggle = true;
+            for (int i=index; i<=lineSize-24; i=findThing(lines, i)) {
                 Order order = new Order(true);
-                order.setDesc(lines.get(i));
-                order.setQuantity(lines.get(i+1));
-                order.setRate(lines.get(i+2));
-                order.setJob(lines.get(i+3));
-                order.setAmount(lines.get(i+5));
-                quote.addOrder(order);
+                if (toggle) {
+                    order.setDesc(lines[i++]);
+                    order.setQuantity(lines[i++]);
+                    order.setRate(lines[i++]);
+                    order.setJob(lines[i++]);
+                    i++;
+                    order.setAmount(lines[i++]);
+                } else {
+                    order.setDesc(lines[i]);
+                    order.setQuantity(lines[i+=2]);
+                    order.setRate(lines[i+=2]);
+                    order.setJob(lines[i+=2]);
+                    order.setAmount(lines[i+=4]);
+                    i++;
+                }
+                toggle = !toggle;
                 out.debug("Description - " + order.getDesc());
-                out.debug("Quantity - " + order.getQuantity());
-                out.debug("Rate - " + order.getRate());
-                out.debug("Job - " + order.getJob());
-                out.debug("Amount - " + order.getAmount());
+                out.debug("   Quantity - " + order.getQuantity());
+                out.debug("       Rate - " + order.getRate());
+                out.debug("        Job - " + order.getJob());
+                out.debug("     Amount - " + order.getAmount());
+                if(!order.getDesc().isBlank()){
+                    po.addOrder(order.isValid(out));
+                }
             }
-            out.debug("Total - $" + quote.getTotal());
-            if(quote.getLastOrder().getDesc().isBlank()){
-                quote.removeOrder(quote.getOrders().size()-1);
-                }*/
+            out.debug("       Memo - " + po.getMemo());
+            out.debug("      Total - $" + po.getTotal());
         }
         out.println();
+        return po.isValid(out);
     }
 }

@@ -1,7 +1,7 @@
 import java.util.Scanner;
 //import java.io.File;
 
-public final class In {
+public final class In extends Base {
     private static Scanner in;
     
     public In(String input) {

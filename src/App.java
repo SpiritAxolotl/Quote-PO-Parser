@@ -1,106 +1,140 @@
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 
-public class App {
+public class App extends Base {
     static File[] dir = (new File("src\\inputs\\extracted\\")).listFiles();
-    //static File[] pos = (new File("src\\inputs\\POs")).listFiles();
-    //static File[] quotes = (new File("src\\inputs\\Quotes")).listFiles();
-    static ArrayList<PO> poList = new ArrayList<PO>();
-    static ArrayList<Quote> quoteList = new ArrayList<Quote>();
+    static HashMap<Integer, PO> poMap = new HashMap<Integer, PO>();
+    static HashMap<Integer, Quote> quoteMap = new HashMap<Integer, Quote>();
+    static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
+    static ArrayList<String> filesNotRead = new ArrayList<String>();
+    static ArrayList<String> filesRead = new ArrayList<String>();
+    static ArrayList<String> filesNotMatched = new ArrayList<String>();
     
-    public static boolean match(String regex, String match) {
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(match);
-        return m.matches();
+    public String[] findSuppliesPO(int id){
+        PO po = poMap.get(id);
+        Order[] temp = po.getOrdersArray();
+        String[] descList = new String[temp.length];
+        for (int i=0; i<temp.length; i++) {
+            descList[i] = temp[i].getDesc();
+        }
+        return descList;
     }
-    //PO ID, date, vendor, orders(desc, quantity, rate, job, amount), total, tracker
+    public String[] findSuppliesQuote(int id){
+        Quote quote = quoteMap.get(id);
+        Order[] temp = quote.getOrdersArray();
+        String[] descList = new String[temp.length];
+        for (int i=0; i<temp.length; i++) {
+            descList[i] = temp[i].getDesc();
+        }
+        return descList;
+    }
     //reminder: comment how everything works later.
 
     public static void main(String[] args) throws Exception {
         Out out = new Out("src\\outputs\\output.txt");
         PrintWriter outPOs = new PrintWriter("src\\outputs\\POs.csv");
         PrintWriter outQuotes = new PrintWriter("src\\outputs\\Quotes.csv");
-        outPOs.println("ID,Date,Vendor,Description,Quantity,Rate,Job,Amount,Total,Memo,Payment Terms,Tracker");
+        outPOs.println("ID,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Tracker");
+        outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total,Tracker");
         File temp = new File("src\\temp.txt");
         temp.deleteOnExit();
-        ArrayList<String> matchList = new ArrayList<String>();
+        ArrayList<String> matchListt = new ArrayList<String>();
         Scanner scan = new Scanner(new File("src\\inputs\\matches.txt"));
         while (scan.hasNextLine()) {
-            matchList.add(scan.nextLine());
+            matchListt.add(scan.nextLine());
         }
         scan.close();
-        /*
-        String match1 = "PO_(\\d{4})_from_Radiance_Solar_LLC_(\\d{5,6})\\.pdf";
-        String match2 = matchList.get(0);
-        out.debug("match1 == match2? " + match1.equals(match2));
-        */
-        //int numFNF = 0;
+        String[] matchList = stringArrayListToArrayStatic(matchListt);
         Tabula t = new Tabula();
-        //iterate through the POs
-        //out.println("POs\n");
-        for (File folder : dir) {for (File aPDF : folder.listFiles()) {
-            out.println("Current file: " + aPDF.getName());
-            out.println("Filepath: " + aPDF.getPath());
-            //out.println("Matches \"" + matchList.get(0) + "\"?");
-            if (match(matchList.get(0), aPDF.getName())) {
-                out.println("Matches!\n");
-                poList.add(t.readTablesPO(aPDF, out));
-            } else if (match(matchList.get(1), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 1));
-            } else if (match(matchList.get(2), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 2));
-            } else if (match(matchList.get(3), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 3));
-            } else if (match(matchList.get(4), aPDF.getName())) {
-                quoteList.add(t.readTablesQuote(aPDF, out, 4));
-            } else {
-                out.println("File didn't match.\n");
-                //numFNF++;
+        WSL wsl = new WSL();
+        int pairID = 0;
+        //iterate through the files
+        for (File folder : dir) {
+            PO po = new PO();
+            ArrayList<Quote> quotes = new ArrayList<Quote>(Arrays.asList(new Quote()));
+            for (File aPDF : folder.listFiles()) {
+                out.println("Current file: \"" + aPDF.getName() + "\"");
+                out.println("Filepath: \"" + aPDF.getPath() + "\"");
+                if (match(matchList[0], (aPDF.getName()))) {
+                    out.println("Matches! Type is PO");
+                    filesRead.add(aPDF.getPath());
+                    po = t.readTables(aPDF, out);
+                    poMap.put(po.getID(), po);
+                } else {
+                    boolean a = true;
+                    if (match(matchList[1], (aPDF.getName()))) {
+                        out.println("Matches! Type is 0");
+                        filesRead.add(aPDF.getPath());
+                        quotes.add(wsl.readTables(aPDF, out, 0));
+                    } else if (match(matchList[2], (aPDF.getName()))) {
+                        out.println("Matches! Type is 1");
+                        filesNotRead.add(aPDF.getPath());
+                        quotes.add(wsl.readTables(aPDF, out, 1));
+                    } else if (match(matchList[3], (aPDF.getName()))) {
+                        out.println("Matches! Type is 2");
+                        filesNotRead.add(aPDF.getPath());
+                        quotes.add(wsl.readTables(aPDF, out, 2));
+                    } else if (match(matchList[4], (aPDF.getName()))) {
+                        out.println("Matches! Type is 3");
+                        filesNotRead.add(aPDF.getPath());
+                        quotes.add(wsl.readTables(aPDF, out, 3));
+                    } else {
+                        out.println("File didn't match.\n");
+                        if (aPDF.getName().substring(aPDF.getName().length()-3).toLowerCase().equals("pdf")) {
+                            filesNotMatched.add(aPDF.getPath());
+                        }
+                        a = false;
+                    }
+                    if (a) {
+                        quoteMap.put(quotes.get(quotes.size()-1).getID(), quotes.get(quotes.size()-1));
+                        wsl.clear();
+                    }
+                }
             }
-        }}
-        //iterate through the Quotes
-        //out.println("Quotes\n");
-        /*
-        for (File quotePDF : quotes) {
-            out.println("Current file: " + quotePDF.getName());
-            out.println("Filepath: " + quotePDF.getPath() + "\n");
-                   if (match(matchList.get(1), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 1));
-            } else if (match(matchList.get(2), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 2));
-            } else if (match(matchList.get(3), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 3));
-            } else if (match(matchList.get(4), quotePDF.getName())) {
-                quoteList.add(t.readTablesQuote(quotePDF, out, 4));
-            } else {
-                out.println("File didn't match.");
+            for (Order o : po.getOrders()) {
+                if (isReference(o.getDesc()) >= 0) {
+                    //do nothing for now
+                }
+            }
+            try {
+                pairs.put(pairID, new Pair(po, quotes));
+                pairID++;
+            } catch (NullPointerException e) {
+                out.println("Error linking PO and Quote. Ignoring for now...");
             }
         }
-        */
-        /* why do I have this section:
-        PO[] everything = new PO[poList.size()];
-        for (int i=0; i<poList.size(); i++) {
-            everything[i] = poList.get(i);
+        for (int id : poMap.keySet()) {
+            outPOs.println(poMap.get(id).toCSV());
         }
-        */
-        for (PO p : poList) {
-            outPOs.println(p.toCSV());
+        for (int id : quoteMap.keySet()) {
+            outQuotes.println(quoteMap.get(id).toCSV());
         }
-        /*
-        for (Quote q : quoteList) {
-            outQuotes.println(q.toCSV());
-        }*/
+        out.println("FILES READ:");
+        for (String str : filesRead) {
+            out.println("\\" + str);
+        }
+        out.lnprintln("FILES NOT READ:");
+        for (String str : filesNotRead) {
+            out.println("\\" + str);
+        }
+        out.lnprintln("FILES NOT MATCHED:");
+        for (String str : filesNotMatched) {
+            out.println("\\" + str);
+        }
+        int totalFiles = filesRead.size() + filesNotRead.size() + filesNotMatched.size();
+        out.lnprintln("TOTAL READ FILES: " + filesRead.size());
+        out.println("TOTAL NOT READ FILES: " + filesNotRead.size());
+        out.println("TOTAL NOT MATCHED FILES: " + filesNotMatched.size());
+        out.println("TOTAL FILES: " + totalFiles);
+        out.lnprintln("PERCENT OF FILES NOT READ OR MATCHED: " + formatDouble((double)(filesNotRead.size()+filesNotMatched.size())*100.0/totalFiles) + "%");
+        out.lnprintln("Program ended successfully!\n");
         outPOs.close();
         outQuotes.close();
-        
-        //out.println("Total Files Not Found: " + numFNF);
-        //out.println("Total Files: " + pos.length);
-        //out.println((1.0-(double)numFNF/pos.length)*100 + "% of files were found");
         out.close();
     }
 }
