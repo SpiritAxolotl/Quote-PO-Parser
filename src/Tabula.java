@@ -45,7 +45,7 @@ public class Tabula extends Base {
                         // print all column-cells of the row plus linefeed
                         for (@SuppressWarnings("rawtypes") RectangularTextContainer content : cells) {
                             // Note: Cell.getText() uses \r to concat text chunks
-                            String text = content.getText().replaceAll("\r", " ");
+                            String text = content.getText().replaceAll("\r", " ").strip();
                             pw.println(text);
                             out.println(i + ": " + text);
                             //poList.add(new PO());
@@ -63,31 +63,32 @@ public class Tabula extends Base {
         //all of this is davey's code:
         //Putting the inputs into a table
         Scanner scan = new Scanner(new File("src\\temp.txt"));
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> linest = new ArrayList<String>();
         while (scan.hasNextLine()) {
-            lines.add(scan.nextLine().trim());
+            linest.add(scan.nextLine().trim());
         }
         scan.close();
-        int lineSize = lines.size();
+        String[] lines = stringArrayListToArray(linest);
+        int lineSize = lines.length;
         //Parsing the stuff in the java table
         //Quote quote = new Quote();
         PO po = new PO();
-        po.setID(lines.get(5));
-        po.setDate(lines.get(4));
-        po.setVendor(lines.get(7));
-        po.setPayTerms(lines.get(3));
+        po.setID(lines[5]);
+        po.setDate(lines[4]);
+        po.setVendor(lines[7]);
+        po.setPayTerms(lines[3]);
         out.debug("         ID - " + po.getID());
         out.debug("       Date - " + po.getDateString());
         out.debug("     Vendor - " + po.getVendor());
         out.debug("  Pay Terms - " + po.getPayTerms());
-        po.setMemo(lines.get(po.findSetTotal(lines)-1));
+        po.setMemo(lines[po.findSetTotal(lines)-1]);
         if (lineSize <= 40) {
             Order order = new Order(true);
-            order.setDesc(lines.get(28));
-            order.setQuantity(lines.get(29));
-            order.setRate(lines.get(30));
-            order.setJob(lines.get(31));
-            order.setAmount(lines.get(33));
+            order.setDesc(lines[28]);
+            order.setQuantity(lines[29]);
+            order.setRate(lines[30]);
+            order.setJob(lines[31]);
+            order.setAmount(lines[33]);
             po.addOrder(order.isValid(out));
             out.debug("Description - " + order.getDesc());
             out.debug("   Quantity - " + order.getQuantity());
@@ -100,14 +101,14 @@ public class Tabula extends Base {
             }
             out.debug("       Memo - " + po.getMemo());
             out.debug("      Total - $" + po.getTotal());
-        } else if (lineSize <= 88) {
-            for (int i=findThing(lines, new int[] {11,1,6})-1; i<=lineSize-12; i+=6) {
+        } else if (lineSize <= 88 && po.getID()!=7144) {
+            for (int i=findThing(lines, findSpecificThing(lines, "Amount")+1); i<=lineSize-12; i+=6) {
                 Order order = new Order(true);
-                order.setDesc(lines.get(i));
-                order.setQuantity(lines.get(i+1));
-                order.setRate(lines.get(i+2));
-                order.setJob(lines.get(i+3));
-                order.setAmount(lines.get(i+5));
+                order.setDesc(lines[i]);
+                order.setQuantity(lines[i+1]);
+                order.setRate(lines[i+2]);
+                order.setJob(lines[i+3]);
+                order.setAmount(lines[i+5]);
                 out.debug("Description - " + order.getDesc());
                 out.debug("   Quantity - " + order.getQuantity());
                 out.debug("       Rate - " + order.getRate());
@@ -115,6 +116,7 @@ public class Tabula extends Base {
                 out.debug("     Amount - " + order.getAmount());
                 if(!order.getDesc().isBlank()){
                     po.addOrder(order.isValid(out));
+                    out.debug("Removing that last one...");
                 }
             }
             out.debug("       Memo - " + po.getMemo());
@@ -136,18 +138,18 @@ public class Tabula extends Base {
             for (int i=index; i<=lineSize-24; i=findThing(lines, i)) {
                 Order order = new Order(true);
                 if (toggle) {
-                    order.setDesc(lines.get(i++));
-                    order.setQuantity(lines.get(i++));
-                    order.setRate(lines.get(i++));
-                    order.setJob(lines.get(i++));
+                    order.setDesc(lines[i++]);
+                    order.setQuantity(lines[i++]);
+                    order.setRate(lines[i++]);
+                    order.setJob(lines[i++]);
                     i++;
-                    order.setAmount(lines.get(i++));
+                    order.setAmount(lines[i++]);
                 } else {
-                    order.setDesc(lines.get(i));
-                    order.setQuantity(lines.get(i+=2));
-                    order.setRate(lines.get(i+=2));
-                    order.setJob(lines.get(i+=2));
-                    order.setAmount(lines.get(i+=4));
+                    order.setDesc(lines[i]);
+                    order.setQuantity(lines[i+=2]);
+                    order.setRate(lines[i+=2]);
+                    order.setJob(lines[i+=2]);
+                    order.setAmount(lines[i+=4]);
                     i++;
                 }
                 toggle = !toggle;
