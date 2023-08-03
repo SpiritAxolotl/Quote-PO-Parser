@@ -59,7 +59,7 @@ public class WSL extends Base {
         Scanner scan = new Scanner(new File("src\\temp.txt"));
         ArrayList<String> linest = new ArrayList<String>();
         for (int k=0; scan.hasNextLine(); k++) {
-            String line = scan.nextLine().strip();
+            String line = removeWeirdChars(scan.nextLine().strip());
             linest.add(line);
             out.println(k + ": " + line);
         }
@@ -95,11 +95,12 @@ public class WSL extends Base {
             //do this for every page
             for (int pb=0; pb<p.length; pb++){
                 index = p[pb];
-                while(!(lines[index].equals("DESCRIPTION") || lines[index].equals("EXT PRICE")) && index<pageBounds[pb]) {
+                while (index<pageBounds[pb]) {
+                    if (lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+[a-zA-Z]{1,3}")) {
+                        break;
+                    }
                     index++;
                 }
-                index += 2;
-                pricepattern = new boolean[] {false, false};
                 
                 ArrayList<Order> orderlist = new ArrayList<Order>();
                 //keep track of the orders when we get to them
@@ -133,39 +134,54 @@ public class WSL extends Base {
                 while(!lines[index].matches("UNIT PRICE") && index<pageBounds[pb]) {
                     index++;
                 }
-                index++;
+                index += 2;
                 
                 //if (lines[index-2].equals("EXT PRICE")) {
                 //true = unit price, false = ext price
                 boolean toggle = true;
                 //true = alt format (rare), false = main format
                 //change this in the future:
-                boolean alt = !lines[index-2].equals("EXT PRICE");
-                while(index<pageBounds[pb]) {
-                    if(lines[index].isBlank()) {
-                        toggle = !toggle;
-                        if (alt && !toggle) {
-                            while(!lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?")) {
-                                index++;
+                boolean alt = false;
+                if (lines[index].equals("EXT PRICE")) {
+                    alt = true;
+                    index += 2;
+                }
+                int snhline = findSpecificThing(lines, "S&H Charges", index)-2;
+                while(index<pageBounds[pb] && index<snhline) {
+                    if (alt) {
+                        if(lines[index].isBlank()) {
+                            toggle = !toggle;
+                        } else if (lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?")) {
+                            if (toggle) {
+                                orderlist.get(ordertrack[0]).setRate(lines[index]);
+                                ordertrack[0]++;
+                            } else {
+                                orderlist.get(ordertrack[1]).setAmount(lines[index]);
+                                ordertrack[1]++;
                             }
-                            //index += 4;
-                            continue;
-                        } else if (alt) {
-                            index++;
+                        } else {
                             break;
                         }
-                    } else if (lines[index].matches("\\d+\\.\\d+(\\/[a-zA-Z]+)?")) {
-                        if (toggle) {
-                            orderlist.get(ordertrack[0]).setRate(lines[index]);
-                            ordertrack[0]++;
-                        } else {
-                            orderlist.get(ordertrack[1]).setAmount(lines[index]);
-                            ordertrack[1]++;
-                        }
+                        index++;
                     } else {
-                        break;
+                        if (lines[index].equals("Subtotal") || lines[index].equals("EXT PRICE")) {
+                            toggle = false;
+                            index += 2;
+                            if (lines[index].equals("EXT PRICE")) {
+                                index += 2;
+                            }
+                            continue;
+                        } else if (!lines[index].isBlank()) {
+                            if (toggle) {
+                                orderlist.get(ordertrack[0]).setRate(lines[index]);
+                                ordertrack[0]++;
+                            } else {
+                                orderlist.get(ordertrack[1]).setAmount(lines[index]);
+                                ordertrack[1]++;
+                            }
+                        }
+                        index++;
                     }
-                    index++;
                 }
                 /*} else {
                     while (!(lines[index].matches("\\d+\\.\\d+\\/[a-zA-Z]+") || lines[index].equals(""))) {
@@ -206,6 +222,18 @@ public class WSL extends Base {
             out.debug("        S&H - " + quote.getSNH());
             out.debug("        Tax - " + quote.getTax());
             out.debug("      Total - " + quote.getTotal());
+            break;
+        case 3:
+            for (int i=0; i<lines.length; i++) {
+                if (lines[i].length() == 1) {
+                    for (String j : new String[] {"<", ",", "4", "$"}) {
+                        if (lines[i].equals(j)) {
+                            lines[i] = "";
+                        }
+                    }
+                }
+            }
+            
             break;
         }
         out.println();

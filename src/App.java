@@ -43,13 +43,13 @@ public class App extends Base {
         outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total,Tracker");
         File temp = new File("src\\temp.txt");
         temp.deleteOnExit();
-        ArrayList<String> matchList = new ArrayList<String>();
+        ArrayList<String> matchListt = new ArrayList<String>();
         Scanner scan = new Scanner(new File("src\\inputs\\matches.txt"));
         while (scan.hasNextLine()) {
-            matchList.add(scan.nextLine());
+            matchListt.add(scan.nextLine());
         }
         scan.close();
-        
+        String[] matchList = stringArrayListToArrayStatic(matchListt);
         Tabula t = new Tabula();
         WSL wsl = new WSL();
         int pairID = 0;
@@ -60,26 +60,26 @@ public class App extends Base {
             for (File aPDF : folder.listFiles()) {
                 out.println("Current file: \"" + aPDF.getName() + "\"");
                 out.println("Filepath: \"" + aPDF.getPath() + "\"");
-                if (match(matchList.get(0), (aPDF.getName()))) {
+                if (match(matchList[0], (aPDF.getName()))) {
                     out.println("Matches! Type is PO");
                     filesRead.add(aPDF.getPath());
                     po = t.readTables(aPDF, out);
                     poMap.put(po.getID(), po);
                 } else {
                     boolean a = true;
-                    if (match(matchList.get(1), (aPDF.getName()))) {
+                    if (match(matchList[1], (aPDF.getName()))) {
                         out.println("Matches! Type is 0");
                         filesRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 0));
-                    } else if (match(matchList.get(2), (aPDF.getName()))) {
+                    } else if (match(matchList[2], (aPDF.getName()))) {
                         out.println("Matches! Type is 1");
                         filesNotRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 1));
-                    } else if (match(matchList.get(3), (aPDF.getName()))) {
+                    } else if (match(matchList[3], (aPDF.getName()))) {
                         out.println("Matches! Type is 2");
                         filesNotRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 2));
-                    } else if (match(matchList.get(4), (aPDF.getName()))) {
+                    } else if (match(matchList[4], (aPDF.getName()))) {
                         out.println("Matches! Type is 3");
                         filesNotRead.add(aPDF.getPath());
                         quotes.add(wsl.readTables(aPDF, out, 3));
@@ -94,6 +94,11 @@ public class App extends Base {
                         quoteMap.put(quotes.get(quotes.size()-1).getID(), quotes.get(quotes.size()-1));
                         wsl.clear();
                     }
+                }
+            }
+            for (Order o : po.getOrders()) {
+                if (isReference(o.getDesc()) >= 0) {
+                    
                 }
             }
             try {

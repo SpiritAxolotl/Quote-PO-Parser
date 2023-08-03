@@ -30,6 +30,14 @@ public abstract class Base {
         return strings;
     }
     
+    public static String[] stringArrayListToArrayStatic(ArrayList<String> strs) {
+        String[] strings = new String[strs.size()];
+        for (int i=0; i<strs.size(); i++) {
+            strings[i] = strs.get(i).strip();
+        }
+        return strings;
+    }
+    
     public ArrayList<String> stringArrayToArrayList(String[] strs) {
         ArrayList<String> strings = new ArrayList<String>();
         for (String i : strs) {
@@ -238,5 +246,38 @@ public abstract class Base {
         
         // Convert the StringBuffer back to a String
         return sb.toString();
+    }
+    
+    public static int isReference(String str) {
+        /*
+        attach
+        quote
+        */
+        String[] matches = {};
+        if (containsAtLeastOneOf(str, matches)) {
+            return 1;
+        }
+        return -1;
+    }
+    
+    public static boolean containsAtLeastOneOf(String str, String[] matches){
+        for (String match : matches) {
+            if (str.contains(match)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    public String removeWeirdChars(String str) {
+        return removeListedChars(str, new String[] {"\u0002", "\u0010", "\u0018", "\u0014"});
+    }
+    public String removeListedChars(String str, String[] replacers) {
+        String clean = str;
+        for (String i : replacers) {
+            clean = clean.replaceAll(i, "");
+        }
+        return clean;
     }
 }

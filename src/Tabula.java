@@ -101,7 +101,7 @@ public class Tabula extends Base {
             }
             out.debug("       Memo - " + po.getMemo());
             out.debug("      Total - $" + po.getTotal());
-        } else if (lineSize <= 88 && po.getID()!=7144) {
+        } else if (lineSize <= 88 && po.getID() != 7144) {
             for (int i=findThing(lines, findSpecificThing(lines, "Amount")+1); i<=lineSize-12; i+=6) {
                 Order order = new Order(true);
                 order.setDesc(lines[i]);
@@ -116,6 +116,7 @@ public class Tabula extends Base {
                 out.debug("     Amount - " + order.getAmount());
                 if(!order.getDesc().isBlank()){
                     po.addOrder(order.isValid(out));
+                } else {
                     out.debug("Removing that last one...");
                 }
             }
