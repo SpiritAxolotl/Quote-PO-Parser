@@ -63,21 +63,12 @@ public class WSL extends Base {
             out.debug("     Vendor - " + quote.getVendor());
             int index = 0;
             //int pages = Integer.parseInt(lines[26].substring(lines[26].length()-1));
-            int[] p = instancesOf(lines, "Quotation");
+            int[] p = instancesOf(lines, lines[0]);
             int[] pageBounds = new int[p.length];
-            if (p.length > 0) {
-                for (int i=1; i<pageBounds.length; i++) {
-                    pageBounds[i-1] = p[i];
-                }
-                pageBounds[pageBounds.length-1] = lineSize;
-            } else {
-                p = instancesOf(lines, "Acknowledgement");
-                pageBounds = new int[p.length];
-                for (int i=1; i<pageBounds.length; i++) {
-                    pageBounds[i-1] = p[i];
-                }
-                pageBounds[pageBounds.length-1] = lineSize;
+            for (int i=1; i<pageBounds.length; i++) {
+                pageBounds[i-1] = p[i];
             }
+            pageBounds[pageBounds.length-1] = lineSize;
             //do this for every page
             for (int pb=0; pb<p.length; pb++){
                 index = p[pb];

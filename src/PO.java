@@ -164,10 +164,10 @@ public class PO extends Base {
         return oldTotal;
     }
     //goes from the bottom of the list until it hits something that isn't blank (assumed to be the total)
-    public int findSetTotal(ArrayList<String> strings) {
-        for(int i=strings.size()-1; i>=0; i--) {
-            if (!strings.get(i).isBlank()) {
-                this.setTotal(strings.get(i));
+    public int findSetTotal(String[] strings) {
+        for(int i=strings.length-1; i>=0; i--) {
+            if (!strings[i].isBlank()) {
+                this.setTotal(strings[i]);
                 return i;
             }
         }
