@@ -28,10 +28,11 @@ public class WSL extends Base {
         ArrayList<String> lines = new ArrayList<String>();
         for (int k=0; scan.hasNextLine(); k++) {
             String line = removeWeirdChars(scan.nextLine().strip());
-            if (type == 3 && line.length() == 1) {
+            if (type == 2 && line.length() == 1) {
                 for (String j : new String[] {"<", ",", "4", "$"}) {
                     if (line.equals(j)) {
                         line = "";
+                        break;
                     }
                 }
             }
@@ -206,16 +207,7 @@ public class WSL extends Base {
             out.debug("        Tax - " + quote.getTax());
             out.debug("      Total - " + quote.getTotal());
             break;
-        case 3:
-            for (int i=0; i<lines.length; i++) {
-                if (lines[i].length() == 1) {
-                    for (String j : new String[] {"<", ",", "4", "$"}) {
-                        if (lines[i].equals(j)) {
-                            lines[i] = "";
-                        }
-                    }
-                }
-            }
+        case 2:
             
             break;
         }
