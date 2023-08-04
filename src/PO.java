@@ -8,6 +8,7 @@ public class PO extends Base {
     private double total;
     private String memo;
     private String payterms;
+    private int quotenum;
     public PO() {
         this.id = -1;
         this.date = new int[] {-1,-1,-1};
@@ -200,7 +201,14 @@ public class PO extends Base {
         this.payterms = payterms;
         return oldPayTerms;
     }
-    
+    public int getQuoteNum() {
+        return this.quotenum;
+    }
+    public int setQuoteNum(int quotenum) {
+        int oldQuoteNum = this.quotenum;
+        this.quotenum = quotenum;
+        return oldQuoteNum;
+    }
     public String toCSV() {
         String concat = "";
         boolean isBeginning = true;
@@ -217,7 +225,8 @@ public class PO extends Base {
                 this.getTotal(),
                 this.getMemo(),
                 this.getPayTerms(),
-                isBeginning
+                //isBeginning
+                this.getQuoteNum(),
             };
             if (isBeginning) {
                 isBeginning = false; 

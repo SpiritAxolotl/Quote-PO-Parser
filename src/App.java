@@ -34,15 +34,14 @@ public class App extends Base {
         return descList;
     }
     //reminder: comment how everything works later.
+    //fuck
 
     public static void main(String[] args) throws Exception {
         Out out = new Out("src\\outputs\\output.txt");
         PrintWriter outPOs = new PrintWriter("src\\outputs\\POs.csv");
         PrintWriter outQuotes = new PrintWriter("src\\outputs\\Quotes.csv");
-        outPOs.println("ID,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Tracker");
-        outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total,Tracker");
-        File temp = new File("src\\temp.txt");
-        temp.deleteOnExit();
+        outPOs.println("PO #,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Quotes?");
+        outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total");
         ArrayList<String> matchListt = new ArrayList<String>();
         Scanner scan = new Scanner(new File("src\\inputs\\matches.txt"));
         while (scan.hasNextLine()) {
@@ -50,9 +49,9 @@ public class App extends Base {
         }
         scan.close();
         String[] matchList = stringArrayListToArrayStatic(matchListt);
-        Tabula t = new Tabula();
-        WSL wsl = new WSL();
-        int pairID = 0;
+        Tabula t = new Tabula(out);
+        WSL wsl = new WSL(out);
+        //int pairID = 0;
         //iterate through the files
         for (File folder : dir) {
             PO po = new PO();
@@ -65,24 +64,25 @@ public class App extends Base {
                     filesRead.add(aPDF.getPath());
                     po = t.readTables(aPDF, out);
                     poMap.put(po.getID(), po);
+                    t.clear();
                 } else {
                     boolean a = true;
                     if (match(matchList[1], (aPDF.getName()))) {
                         out.println("Matches! Type is 0");
                         filesRead.add(aPDF.getPath());
-                        quotes.add(wsl.readTables(aPDF, out, 0));
+                        quotes.add(wsl.readTables(aPDF, 0));
                     } else if (match(matchList[2], (aPDF.getName()))) {
                         out.println("Matches! Type is 1");
                         filesNotRead.add(aPDF.getPath());
-                        quotes.add(wsl.readTables(aPDF, out, 1));
+                        quotes.add(wsl.readTables(aPDF, 1));
                     } else if (match(matchList[3], (aPDF.getName()))) {
                         out.println("Matches! Type is 2");
                         filesNotRead.add(aPDF.getPath());
-                        quotes.add(wsl.readTables(aPDF, out, 2));
+                        quotes.add(wsl.readTables(aPDF, 2));
                     } else if (match(matchList[4], (aPDF.getName()))) {
                         out.println("Matches! Type is 3");
                         filesNotRead.add(aPDF.getPath());
-                        quotes.add(wsl.readTables(aPDF, out, 3));
+                        quotes.add(wsl.readTables(aPDF, 3));
                     } else {
                         out.println("File didn't match.\n");
                         if (aPDF.getName().substring(aPDF.getName().length()-3).toLowerCase().equals("pdf")) {
@@ -101,12 +101,14 @@ public class App extends Base {
                     //do nothing for now
                 }
             }
+            /*
             try {
                 pairs.put(pairID, new Pair(po, quotes));
                 pairID++;
             } catch (NullPointerException e) {
                 out.println("Error linking PO and Quote. Ignoring for now...");
             }
+            */
         }
         for (int id : poMap.keySet()) {
             outPOs.println(poMap.get(id).toCSV());

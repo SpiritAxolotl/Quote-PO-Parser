@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -8,66 +9,39 @@ import java.util.Scanner;
 public class WSL extends Base {
     private String[] lines;
     private Quote quote;
-    private boolean[] pricepattern;
     private int index;
+    private Out out;
+    private int type;
+    private File file;
+    public WSL(Out out) {
+        this.out = out;
+    }
     public void clear() {
         lines = null;
         quote = null;
-        pricepattern = null;
+        file = null;
         index = 0;
+        type = 0;
     }
-    public int incrementIndexLog(int index) {
-        if(lines[index].equals("UNIT PRICE")){
-                    index += 2;
-                    pricepattern[0] = true;
-                }
-                if(lines[index].equals("EXT PRICE")){
-                    index += 2;
-                    pricepattern[1] = true;
-                }
-                if(lines[index].equals("SHIPPING INSTRUCTIONS")){
-                    index += 4;
-                }
-        return index + 1;
-    }
-    public Quote readTables(File file, Out out, int type) throws Exception {
-        try {
-            // Define the WSL command to run
-            String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"src/temp.txt\"";
-            out.println("Running command \"" + wslCommand + "\"...");
-            // Create a ProcessBuilder with the WSL command
-            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", wslCommand);
-            
-            // Redirect error stream to the same as the output stream
-            processBuilder.redirectErrorStream(true);
-            
-            // Start the process
-            Process process = processBuilder.start();
-            
-            // Read the output of the process
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            for (String line; (line = reader.readLine()) != null;) {
-                out.println(line);
-            }
-            
-            // Wait for the process to complete
-            int exitCode = process.waitFor();
-            out.println("Exit Code: " + exitCode);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        Scanner scan = new Scanner(new File("src\\temp.txt"));
-        ArrayList<String> linest = new ArrayList<String>();
+    private String[] arrayAndPrintStuff(String filepath, Out out) throws FileNotFoundException {
+        Scanner scan = new Scanner(new File(filepath));
+        ArrayList<String> lines = new ArrayList<String>();
         for (int k=0; scan.hasNextLine(); k++) {
             String line = removeWeirdChars(scan.nextLine().strip());
-            linest.add(line);
+            if (type == 3 && line.length() == 1) {
+                for (String j : new String[] {"<", ",", "4", "$"}) {
+                    if (line.equals(j)) {
+                        line = "";
+                    }
+                }
+            }
+            lines.add(line);
             out.println(k + ": " + line);
         }
         scan.close();
-        lines = stringArrayListToArray(linest);
-        int lineSize = lines.length;
-        //Parsing the stuff in the java table
-        quote = new Quote();
+        return stringArrayListToArray(lines);
+    }
+    private void parse() {
         switch(type) {
         case 0:
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
@@ -91,7 +65,7 @@ public class WSL extends Base {
             for (int i=1; i<pageBounds.length; i++) {
                 pageBounds[i-1] = p[i];
             }
-            pageBounds[pageBounds.length-1] = lineSize;
+            pageBounds[pageBounds.length-1] = lines.length;
             //do this for every page
             for (int pb=0; pb<p.length; pb++){
                 index = p[pb];
@@ -246,6 +220,43 @@ public class WSL extends Base {
             break;
         }
         out.println();
+    }
+    private void wslCommand(File file) {
+        try {
+            // Define the WSL command to run
+            String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"src/temp.txt\"";
+            out.println("Running command \"" + wslCommand + "\"...");
+            // Create a ProcessBuilder with the WSL command
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", wslCommand);
+            
+            // Redirect error stream to the same as the output stream
+            processBuilder.redirectErrorStream(true);
+            
+            // Start the process
+            Process process = processBuilder.start();
+            
+            // Read the output of the process
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            for (String line; (line = reader.readLine()) != null;) {
+                out.println(line);
+            }
+            
+            // Wait for the process to complete
+            int exitCode = process.waitFor();
+            out.println("Exit Code: " + exitCode);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    public Quote readTables(File filee, int type) throws Exception {
+        this.type = type;
+        this.file = filee;
+        wslCommand(file);
+        lines = arrayAndPrintStuff("src\\temp.txt", out);
+        //int lineSize = lines.length;
+        //Parsing the stuff in the java table
+        quote = new Quote();
+        parse();
         //return quote.isValid(out);
         return quote;
     }

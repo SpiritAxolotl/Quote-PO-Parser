@@ -269,7 +269,6 @@ public abstract class Base {
         return false;
     }
     
-    
     public String removeWeirdChars(String str) {
         return removeListedChars(str, new String[] {"\u0002", "\u0010", "\u0018", "\u0014"});
     }

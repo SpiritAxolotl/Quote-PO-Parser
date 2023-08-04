@@ -230,8 +230,8 @@ public class Quote extends Base {
                 //this.getSubtotal(),
                 this.getSNH(),
                 this.getTax(),
-                this.getTotal(),
-                isBeginning
+                this.getTotal()
+                //isBeginning
             };
             if (isBeginning) {
                 isBeginning = false;
