@@ -240,20 +240,20 @@ public class Quote extends Base {
         }
         return concat;
     }
-    public Quote isValid(Out out) throws NullPointerException {
-        if(
+    public Quote isValid(Out out, int type) throws NullPointerException {
+        if( (type == 0) && (
             this.getID() == -1 ||
             this.getCustomerNum() == -1 ||
             (this.getDate(0) == -1 || this.getDate(1) == -1 || this.getDate(2) == -1) ||
             this.getVendor().isBlank() ||
             this.getTotal() == -1
-        ){
+        )){
             String message = "Parameters missing: ";
             if (this.getID() == -1) {
                 message += "Quote Number, ";
             }
             if (this.getCustomerNum() == -1) {
-                message += "Customer PO Number, ";
+                message += "PO Number, ";
             }
             if (this.getDate(0) == -1 || this.getDate(1) == -1 || this.getDate(2) == -1) {
                 message += "Ship Date, ";
@@ -266,8 +266,8 @@ public class Quote extends Base {
             }
             message = message.substring(0, message.length()-2);
             out.println(message);
-            //out.close();
-            //throw new NullPointerException(message);
+            out.close();
+            throw new NullPointerException(message);
         }
         return this;
     }

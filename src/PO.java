@@ -226,7 +226,7 @@ public class PO extends Base {
                 this.getMemo(),
                 this.getPayTerms(),
                 //isBeginning
-                this.getQuoteNum(),
+                this.getQuoteNum()
             };
             if (isBeginning) {
                 isBeginning = false; 

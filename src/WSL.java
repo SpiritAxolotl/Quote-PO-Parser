@@ -208,7 +208,7 @@ public class WSL extends Base {
             out.debug("      Total - " + quote.getTotal());
             break;
         case 2:
-            
+            out.println();
             break;
         }
         out.println();
@@ -249,7 +249,7 @@ public class WSL extends Base {
         //Parsing the stuff in the java table
         quote = new Quote();
         parse();
-        //return quote.isValid(out);
-        return quote;
+        return quote.isValid(out, type);
+        //return quote;
     }
 }

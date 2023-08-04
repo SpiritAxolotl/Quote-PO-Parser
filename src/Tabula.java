@@ -80,8 +80,8 @@ public class Tabula extends Base {
         //Parsing the stuff in the java table
         //Quote quote = new Quote();
         po = new PO();
-        po.setQuoteNum(file.getParentFile().listFiles().length-1);
         po.setID(lines[5]);
+        po.setQuoteNum(file.getParentFile().listFiles().length-1);
         po.setDate(lines[4]);
         po.setVendor(lines[7]);
         po.setPayTerms(lines[3]);
@@ -89,6 +89,7 @@ public class Tabula extends Base {
         out.debug("       Date - " + po.getDateString());
         out.debug("     Vendor - " + po.getVendor());
         out.debug("  Pay Terms - " + po.getPayTerms());
+        out.debug("    Quotes? - " + po.getQuoteNum());
         po.setMemo(lines[po.findSetTotal(lines)-1]);
         if (lineSize <= 40) {
             Order order = new Order(true);
