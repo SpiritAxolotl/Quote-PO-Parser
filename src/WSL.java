@@ -92,12 +92,6 @@ public class WSL extends Base {
                 //keep track of the orders when we get to them
                 int[] ordertrack = {-1,0,0};
                 
-                
-                
-                
-                
-                
-                
                 while (index<pageBounds[pb]) {
                     if (lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+[a-zA-Z]{1,3}")) {
                         break;
@@ -208,7 +202,7 @@ public class WSL extends Base {
             out.debug("        S&H - " + quote.getSNH());
             out.debug("        Tax - " + quote.getTax());
             out.debug("      Total - " + quote.getTotal());
-        } else if (type == 2) {
+        } else if (type == 1) {
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
             try {
                 out.debug(file.getParentFile().getName());
