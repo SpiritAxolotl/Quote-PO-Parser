@@ -30,7 +30,7 @@ public class Order extends Base {
     }
     public String appendDesc(String desc) {
         String oldDesc = this.desc;
-        this.setDesc(oldDesc + desc);
+        this.setDesc(oldDesc + " " + desc);
         return oldDesc;
     }
     public int getQuantity() {
