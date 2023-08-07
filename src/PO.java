@@ -29,9 +29,7 @@ public class PO extends Base {
     }
     public int setID(String id) {
         int oldID = this.id;
-        try {
-            this.setID(Integer.parseInt(id));
-        } catch (NullPointerException | NumberFormatException er) {}
+        this.setID(Integer.parseInt(id));
         return oldID;
     }
     public int[] getDate() {
@@ -71,9 +69,9 @@ public class PO extends Base {
     public int[] setDate(String date) {
         int[] oldDate = this.date;
         String[] newDate = date.split("/");
-        for (int i=0;i<3;i++) { try {
+        for (int i=0;i<3;i++) {
             this.setDate(i, Integer.parseInt(newDate[i]));
-        } catch (NullPointerException | NumberFormatException er) {}}
+        }
         return oldDate;
     }
     public int findSetDate(ArrayList<String> strings) {

@@ -15,7 +15,6 @@ import technology.tabula.RectangularTextContainer;
 import technology.tabula.Table;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
-//Vendor name, quote date, vendor quote number, our reference, product code, product description, quantity, unit price, total price per line.
 public class Tabula extends Base {
     private Out out;
     private PO po;

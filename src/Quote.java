@@ -32,13 +32,11 @@ public class Quote extends Base {
     }
     public int setID(String id) {
         int oldID = this.id;
-        try {
-            if (id.substring(0,1).equals("S")) {
-                this.setID(Integer.parseInt(id.substring(1)));
-            } else {
+        if (id.substring(0,1).equals("S")) {
+            this.setID(Integer.parseInt(id.substring(1)));
+        } else {
             this.setID(Integer.parseInt(id));
-            }
-        } catch (NullPointerException | NumberFormatException er) {}
+        }
         return oldID;
     }
     public int getCustomerNum() {
@@ -51,9 +49,7 @@ public class Quote extends Base {
     }
     public int setCustomerNum(String custnum) {
         int oldNum = this.custnum;
-        try {
-            this.setCustomerNum(Integer.parseInt(custnum.strip()));
-        } catch (NullPointerException | NumberFormatException er) {}
+        this.setCustomerNum(Integer.parseInt(custnum.strip()));
         return oldNum;
     }
     public int[] getDate() {

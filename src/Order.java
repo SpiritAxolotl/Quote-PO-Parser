@@ -62,14 +62,13 @@ public class Order extends Base {
         int oldQuantity = this.quantity;
         String cleanQty = quantity.strip().replaceAll(",","");
         if (this.type) {
-            try {
-                this.setQuantity(Integer.parseInt(cleanQty));
-            } catch (NullPointerException | NumberFormatException er) {}
+            this.setQuantity(Integer.parseInt(cleanQty));
         } else {
             int i = 1;
             try {
-                for (; i<quantity.length(); i++) {
+                while (i<quantity.length()) {
                     this.setQuantity(Integer.parseInt(cleanQty.substring(0,i)));
+                    i++;
                 }
             } catch (NullPointerException | NumberFormatException er) {
                 i--;
@@ -98,15 +97,13 @@ public class Order extends Base {
     public double setRate(String rate) {
         double oldRate = this.rate;
         String cleanRate = rate.strip().replaceAll(",", "").replaceAll("\"", "");
-        try {
-            if (this.type) {
-                this.setRate(Double.parseDouble(cleanRate));
-            } else {
-                String[] split = cleanRate.split("\\/");
-                this.setRate(Double.parseDouble(split[0]));
-                this.setRateUnit(split[1]);
-            }
-        } catch (NullPointerException | ArrayIndexOutOfBoundsException | NumberFormatException er) {}
+        if (this.type) {
+            this.setRate(Double.parseDouble(cleanRate));
+        } else {
+            String[] split = cleanRate.split("\\/");
+            this.setRate(Double.parseDouble(split[0]));
+            this.setRateUnit(split[1]);
+        }
         return oldRate;
     }
     public String setRateUnit(String rateunit) {
@@ -133,9 +130,7 @@ public class Order extends Base {
     public double setAmount(String amount) {
         double oldAmount = this.rate;
         String cleanAmount = amount.strip().replaceAll(",", "").replaceAll("\"", "");
-        try {
-            this.setAmount(Double.parseDouble(cleanAmount));
-        } catch (NullPointerException | NumberFormatException er) {}
+        this.setAmount(Double.parseDouble(cleanAmount));
         return oldAmount;
     }
     //add another case for the quotes at some point
