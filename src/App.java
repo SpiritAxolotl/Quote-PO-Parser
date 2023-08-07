@@ -109,7 +109,14 @@ public class App extends Base {
                     boolean a = true;
                     if (match(matchList[1], (aPDF.getName()))) {
                         out.println("Matches! Type is 0");
-                        //quotes.add(wsl.readTables(aPDF, 0));
+                        try {
+                            Quote quote = wsl.readTables(aPDF, 0);
+                            quotes.add(quote);
+                            filesRead.add(aPDF.getPath());
+                        } catch (Exception e) {
+                            filesNotRead.add(aPDF.getPath());
+                            out.println("File didn't parse correctly! Do this one manually.");
+                        }
                     } else if (match(matchList[2], (aPDF.getName()))) {
                         out.println("Matches! Type is 1");
                         out.println("File not configured yet! (Davey's fault). Do this one manually.");

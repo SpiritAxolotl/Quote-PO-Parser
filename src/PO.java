@@ -257,7 +257,6 @@ public class PO extends Base {
             }
             message = message.substring(0, message.length()-2);
             out.println(message);
-            out.close();
             throw new NullPointerException(message);
         }
         return this;

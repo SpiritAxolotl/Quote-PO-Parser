@@ -208,7 +208,7 @@ public class WSL extends Base {
             out.debug("        S&H - " + quote.getSNH());
             out.debug("        Tax - " + quote.getTax());
             out.debug("      Total - " + quote.getTotal());
-        } else if (type == 2) {
+        } else if (type == 2 && type == 5) {
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
             try {
                 out.debug(file.getParentFile().getName());
