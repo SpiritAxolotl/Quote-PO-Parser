@@ -91,9 +91,6 @@ public class Quote extends Base {
     }
     public String setVendor(String vendor) {
         String oldVendor = this.vendor;
-        /*if(vendor.contains("Atlanta Electrical Distributions"))
-            this.vendor = "AED";
-        else*/
         this.vendor = vendor;
         return oldVendor;
     }
@@ -104,6 +101,9 @@ public class Quote extends Base {
         return this.getOrder(0);
     }
     public Order getLastOrder() {
+        if (this.orders.size() == 0) {
+            return this.getOrder(0);
+        }
         return this.getOrder(this.orders.size()-1);
     }
     public Order[] getOrdersArray() {

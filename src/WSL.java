@@ -68,7 +68,7 @@ public class WSL extends Base {
                 out.debug(file.getParentFile().getName());
                 quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                out.debug("parse fail");
+                out.debug("PO number parse fail");
                 quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
             }
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
@@ -208,13 +208,13 @@ public class WSL extends Base {
             out.debug("        S&H - " + quote.getSNH());
             out.debug("        Tax - " + quote.getTax());
             out.debug("      Total - " + quote.getTotal());
-        } else if (type == 2 && type == 5) {
+        } else if (type == 2) {
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
             try {
                 out.debug(file.getParentFile().getName());
                 quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                out.debug("parse fail");
+                out.debug("PO number parse fail");
                 quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
             }
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);

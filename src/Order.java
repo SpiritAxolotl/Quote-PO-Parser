@@ -8,21 +8,7 @@ public class Order extends Base {
     private String rateunit; //quote exclusive
     private String job;
     private double amount; //gonna act as ext price too
-    /*public Order(String desc, int quantity, double rate, String job, double amount) {
-        this.desc = desc;
-        this.quantity = quantity;
-        this.rate = rate;
-        this.job = job;
-        this.amount = amount;
-    }
-    public Order(int quantity, String qtyunit, String desc, double rate, String rateunit, double amount) {
-        this.quantity = quantity;
-        this.qtyunit = qtyunit;
-        this.desc = desc;
-        this.rate = rate;
-        this.rateunit = rateunit;
-        this.amount = amount;
-    }*/
+    
     public Order(boolean type) {
         this.type = type;
         this.quantity = -1;
