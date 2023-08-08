@@ -226,7 +226,11 @@ public class WSL extends Base {
                 pageBounds[i-1] = p[i];
             }
             pageBounds[pageBounds.length-1] = lines.length;
-            boolean[] toggles = {false, false, false};
+            boolean[] toggles = {false, false, false, true};
+            //keep track of the orders when we get to them
+            int[] ordertrack = {0,0,0,0};
+            int ordersync = 0;
+            ArrayList<Order> orderlist = new ArrayList<Order>();
             //do this for every page
             for (int pb=0; pb<p.length; pb++){
                 index = p[pb];
@@ -237,34 +241,69 @@ public class WSL extends Base {
                     index++;
                 }
                 
-                ArrayList<Order> orderlist = new ArrayList<Order>();
-                
-                //keep track of the orders when we get to them
-                int[] ordertrack = {0,0,0};
-                
-                while (lines[index].matches("\\d+[a-zA-Z]{1,3}")) {
-                    orderlist.add(new Order(false));
-                    orderlist.get(ordertrack[0]).setQuantity(lines[index]);
+                while (lines[index].matches("\\d+[a-zA-Z]{1,3}") || lines[index].isBlank()) {
+                    if (!lines[index].isBlank()) {
+                        orderlist.add(new Order(false));
+                        orderlist.get(ordertrack[0]).setQuantity(lines[index]);
+                        ordertrack[0]++;
+                    }
                     index++;
-                    ordertrack[0]++;
                 }
                 
                 
                 //index = findSpecificThing(lines, "ORDERED BY", index);
-                
+                int oldindex = index;
+                int orderbound = lines.length;
+                if (pb >= 1) {
+                    index = findSpecificThing(lines, "ORDERED BY", index);
+                    orderbound = index;
+                } else {
+                    while (index<pageBounds[pb]) {
+                        if (lines[index].equals("WORLD ELECTRIC SUPPLY, INC.")) {
+                            index += 2;
+                        }
+                        if (lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+") && !lines[index].matches("\\d+ of \\d+")) {
+                            break;
+                        }
+                        index++;
+                    }
+                }
                 while (index<pageBounds[pb]) {
+                    if (lines[index].equals("WORLD ELECTRIC SUPPLY, INC.")) {
+                        index += 2;
+                    }
                     if (lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+") && !lines[index].matches("\\d+ of \\d+")) {
                         break;
                     }
                     index++;
                 }
-                
-                while (index<pageBounds[pb] && !lines[index].toLowerCase().contains("continued on next page")) {
+                new Object(); //breakpoint
+                //I misunderstood how the format actually was but the code works as intended(?) so I'm not fixing it lmao
+                //update: no. the code does Not work as intended and I should refactor
+                while (index<pageBounds[pb] && !lines[index].toLowerCase().contains("continued on next page") && !lines[index].matches("S\\d{8,}")) {
+                    /*
+                    if (lines[index].contains("ORDERED BY")) {
+                        index++;
+                        while (index<pageBounds[pb]) {
+                            if (lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+") && !lines[index].matches("\\d+ of \\d+")) {
+                                break;
+                            }
+                            index++;
+                        }
+                        continue;
+                    }
+                    */
                     if (!toggles[1] && !toggles[0] && lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+")) {
                         toggles[1] = true;
                         orderlist.get(ordertrack[1]).setDesc(lines[index].substring(lines[index].indexOf(" ")+1));
                     } else if (toggles[1] && !lines[index].isBlank()) {
-                        orderlist.get(ordertrack[1]).appendDesc(lines[index]);
+                        if (lines[index].matches("\\d+ .+") && pb >= 1) {
+                                toggles[1] = false;
+                                ordertrack[1]++;
+                                index--;
+                            } else {
+                                orderlist.get(ordertrack[1]).appendDesc(lines[index]);
+                            }
                     } else if (toggles[1]) {
                         ordertrack[1]++;
                         toggles[1] = false;
@@ -272,7 +311,6 @@ public class WSL extends Base {
                     } else if (toggles[2]) {
                         if (lines[index].matches("\\d+")) {
                             toggles[2] = false;
-                            toggles[0] = true;
                         }
                     } else if (toggles[0]) {
                         if (lines[index].matches("\\d+")) {
@@ -281,39 +319,97 @@ public class WSL extends Base {
                     }
                     index++;
                 }
+                if (pb >= 1) {
+                    while(!lines[index].equals("FREIGHT ALLOWED") && index<pageBounds[pb]) {
+                        index++;
+                    }
+                    index += 2;
+                    while(!lines[index].isBlank()) {
+                        orderlist.get(ordersync).appendDesc(lines[index]);
+                        index++;
+                    }
+                    
+                    index = oldindex;
+                    while (!lines[index].matches("\\d+ .+")) {
+                        index++;
+                    }
+                    
+                    while (index<pageBounds[pb] && !lines[index].toLowerCase().contains("continued on next page") && index < orderbound) {
+                        /*
+                        if (lines[index].contains("ORDERED BY")) {
+                            index++;
+                            while (index<pageBounds[pb]) {
+                                if (lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+") && !lines[index].matches("\\d+ of \\d+")) {
+                                    break;
+                                }
+                                index++;
+                            }
+                            continue;
+                        }
+                        */
+                        if (!toggles[1] && !toggles[0] && lines[index].contains(" ") && lines[index].split(" ")[0].matches("\\d+")) {
+                            toggles[1] = true;
+                            orderlist.get(ordertrack[1]).setDesc(lines[index].substring(lines[index].indexOf(" ")+1));
+                        } else if (toggles[1] && !lines[index].isBlank()) {
+                            orderlist.get(ordertrack[1]).appendDesc(lines[index]);
+                        } else if (toggles[1]) {
+                            ordertrack[1]++;
+                            toggles[1] = false;
+                            toggles[2] = true;
+                        } else if (toggles[2]) {
+                            if (lines[index].matches("\\d+")) {
+                                toggles[2] = false;
+                            }
+                        } else if (toggles[0]) {
+                            if (lines[index].matches("\\d+")) {
+                                toggles[0] = false;
+                            }
+                        }
+                        index++;
+                    }
+                }
+                ordersync = ordertrack[1]-1;
                 
-                while (!lines[index].matches("\\d+\\.\\d+[a-zA-Z]{1,3}") && index<pageBounds[pb]) {
+                index = findSpecificThing(lines, "EXT PRICE", index);
+                
+                while (!lines[index].matches("\\d+\\.\\d+( \\w+)?")) {
                     index++;
                 }
-                quote.addOrders(orderlist);
-                while(lines[index].equals("Subtotal") && index<pageBounds[pb]) {
-                    index += 2;
+                
+                while (!lines[index].equals("Subtotal") && index<pageBounds[pb]) {
+                    if (lines[index].isBlank()) {
+                            toggles[3] = !toggles[3];
+                        } else if (lines[index].matches("\\d+\\.\\d+( \\w+)?")) {
+                            if (toggles[3]) {
+                                orderlist.get(ordertrack[2]).setRate(lines[index]);
+                                ordertrack[2]++;
+                            } else {
+                                orderlist.get(ordertrack[3]).setAmount(lines[index]);
+                                ordertrack[3]++;
+                            }
+                        } else {
+                            break;
+                        }
+                    index++;
                 }
-                for(Order order : quote.getOrders()) {
-                    out.debug("Description - " + order.getDesc());
-                    out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
-                    out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
-                    out.debug("  Ext Price - " + order.getAmount());
-                }
-                quote.addOrders(orderlist);
-                while(lines[index].equals("Subtotal") && index<pageBounds[pb]) {
-                    index += 2;
-                }
-                for(Order order : quote.getOrders()) {
-                    out.debug("Description - " + order.getDesc());
-                    out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
-                    out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
-                    out.debug("  Ext Price - " + order.getAmount());
-                }
+                toggles[3] = true;
             }
-            quote.setSubtotal(lines[index]);
-            quote.setSNH(lines[index=findThing(lines, findSpecificThing(lines, "S&H Charges", index)+1)]);
-            quote.setTotal(lines[index=findThing(lines, findSpecificThing(lines, "Amount Due", index)+1)]);
-            quote.findSetTax();
-            out.debug("   Subtotal - " + quote.getSubtotal());
-            out.debug("        S&H - " + quote.getSNH());
-            out.debug("        Tax - " + quote.getTax());
-            out.debug("      Total - " + quote.getTotal());
+            quote.addOrders(orderlist);
+            for(Order order : quote.getOrders()) {
+                out.debug("Description - " + order.getDesc());
+                out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
+                out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
+                out.debug("  Ext Price - " + order.getAmount());
+            }
+            new Object();
+            //quote.setSubtotal(lines[index]);
+            //quote.setSNH(lines[index=findThing(lines, findSpecificThing(lines, "S&H Charges", index)+1)]);
+            //quote.setTotal(lines[index=findThing(lines, findSpecificThing(lines, "Amount Due", index)+1)]);
+            //quote.findSetTax();
+            //out.debug("   Subtotal - " + quote.getSubtotal());
+            //out.debug("        S&H - " + quote.getSNH());
+            //out.debug("        Tax - " + quote.getTax());
+            //out.debug("      Total - " + quote.getTotal());
         }
         out.println();
     }

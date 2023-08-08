@@ -86,7 +86,7 @@ public class Order extends Base {
         if (this.type) {
             this.setRate(Double.parseDouble(cleanRate));
         } else {
-            String[] split = cleanRate.split("\\/");
+            String[] split = cleanRate.split("\\/| ");
             this.setRate(Double.parseDouble(split[0]));
             this.setRateUnit(split[1]);
         }
