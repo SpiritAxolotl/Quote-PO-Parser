@@ -82,7 +82,7 @@ public class Order extends Base {
     }
     public double setRate(String rate) {
         double oldRate = this.rate;
-        String cleanRate = rate.strip().replaceAll(",", "").replaceAll("\"", "").replaceAll("$", "");
+        String cleanRate = rate.strip().replaceAll(",|\"|\\$", "");
         if (this.type || (cleanRate.length() > 0 && cleanRate.substring(cleanRate.length()-1).matches("\\d"))) {
             this.setRate(Double.parseDouble(cleanRate));
         } else {
@@ -115,7 +115,7 @@ public class Order extends Base {
     }
     public double setAmount(String amount) {
         double oldAmount = this.rate;
-        String cleanAmount = amount.strip().replaceAll(",", "").replaceAll("\"", "").replaceAll("$", "");
+        String cleanAmount = amount.strip().replaceAll(",|\"|\\$", "");
         this.setAmount(Double.parseDouble(cleanAmount));
         return oldAmount;
     }

@@ -73,6 +73,14 @@ public abstract class Base {
         return -1;
     }
     
+    public int findNotThing(String[] strings, int index) {
+        for(int i=index; i<strings.length; i++) {
+            if (strings[i].isBlank()) {
+                return i;
+            }
+        }
+        return -1;
+    }
     public int findThing(String[] strings, int index) {
         for(int i=index; i<strings.length; i++) {
             if (!strings[i].isBlank()) {
@@ -94,6 +102,9 @@ public abstract class Base {
             index = thing + 1;
         }
         return index - 1;
+    }
+    public int findNotThing(ArrayList<String> strings, int index) {
+        return findNotThing(stringArrayListToArray(strings), index);
     }
     public int findThing(ArrayList<String> strings) {
         return findThing(stringArrayListToArray(strings));

@@ -173,7 +173,7 @@ public class PO extends Base {
         return -1;
     }
     public double setTotal(String total) {
-        String cleanTotal = total.trim().replaceAll(",", "");
+        String cleanTotal = total.strip().replaceAll(",", "");
         return this.setTotal(
             Double.parseDouble(
                 cleanTotal.substring(

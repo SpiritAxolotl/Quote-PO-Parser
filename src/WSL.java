@@ -77,7 +77,7 @@ public class WSL extends Base {
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
             quote.setVendor(lines[1]);
             out.debug("  Quote Num - " + quote.getID());
-            out.debug("CustomerNum - " + quote.getCustomerNum());
+            out.debug("     PO Num - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
             //index = 0;
@@ -217,7 +217,7 @@ public class WSL extends Base {
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
             quote.setVendor(lines[1]);
             out.debug("  Quote Num - " + quote.getID());
-            out.debug("CustomerNum - " + quote.getCustomerNum());
+            out.debug("     PO Num - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
             p = instancesOf(lines, lines[0]);
@@ -409,11 +409,22 @@ public class WSL extends Base {
             //out.debug("   Subtotal - " + quote.getSubtotal());
             //out.debug("        S&H - " + quote.getSNH());
             //out.debug("        Tax - " + quote.getTax());
-            //out.debug("      Total - " + quote.getTotal());
+            out.debug("      Total - " + quote.getTotal());
         } else if (type == 2) {
             quote.setVendor("Graybar");
             quote.setID(lines[findThing(lines, findSpecificThing(lines, "GB Quote #:")+1)]);
             quote.setDate(lines[findThing(lines, findSpecificThing(lines, "Date:")+1)]);
+            try {
+                out.debug(file.getParentFile().getName());
+                quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                out.debug("PO number parse fail");
+                quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
+            }
+            out.debug("  Quote Num - " + quote.getID());
+            out.debug("     PO Num - " + quote.getCustomerNum());
+            out.debug("  Ship Date - " + quote.getDateString());
+            out.debug("     Vendor - " + quote.getVendor());
             //keep track of the orders when we get to them
             int ordertrack = 0;
             ArrayList<Order> orderlist = new ArrayList<Order>();
@@ -427,6 +438,7 @@ public class WSL extends Base {
                 Order order = orderlist.get(ordertrack);
                 boolean toggle = true;
                 while (index<orderends[ordertrack]) {
+                    //skips lines that have standard stuff we don't want to parse
                     if (equalsAny(lines[index], new String[] {
                             "Item/Type Quantity",
                             "Supplier",
@@ -438,35 +450,55 @@ public class WSL extends Base {
                         }) ||
                         containsAny(lines[index], new String[] {
                             "UPC #",
-                            "GB Part #"
+                            "GB Part #",
+                            "Item Note"
                         })
                     ){
-                        index += 2;
+                        index = findThing(lines, findNotThing(lines, index));
                         continue;
                     }
+                    //skips blank lines
+                    if (lines[index].isBlank()) {
+                        index++;
+                        continue;
+                    }
+                    //UoM
                     if (lines[index].matches("\\d+")) {
                         if (lines[index+1].contains("GB Part #:")) {
                             index++;
                         } else {
                             order.setRateUnit(lines[index]);
                         }
-                    } else if (lines[index].matches("\\d+ \\w{2} .+")){
+                    //Quantity / Unit
+                    } else if (lines[index].matches("\\d+ EA .+")){
                         order.setQuantity(lines[index].substring(0, lines[index].indexOf(" ", lines[index].indexOf(" ")+1)));
-                        while (!lines[index].isBlank()){
-                            index++;
+                        if (ordertrack % 2 == 0) {
+                            index = findThing(lines, findNotThing(lines, index+2))-1;
+                        } else {
+                            index = findThing(lines, findNotThing(lines, index))-1;
                         }
+                    //Unit Price and Ext Price
                     } else if (!lines[index].isBlank() && lines[index].substring(0,1).equals("$")) {
+                        //Unit Price
                         if (toggle) {
                             order.setRate(lines[index]);
                             toggle = false;
+                        //Ext Price
                         } else {
                             order.setAmount(lines[index]);
                         }
+                    //Description
                     } else if (!lines[index].isBlank()) {
                         order.setDesc(lines[index]);
+                        index++;
                         while (!lines[index].isBlank()){
-                            index++;
                             order.appendDesc(lines[index]);
+                            index++;
+                        }
+                        if (ordertrack % 2 == 0) {
+                            index = findThing(lines, findNotThing(lines, index))-1;
+                        } else {
+                            index = findThing(lines, findNotThing(lines, index+2))-1;
                         }
                         continue;
                     }
@@ -474,6 +506,17 @@ public class WSL extends Base {
                 }
             }
             quote.addOrders(orderlist);
+            for(Order order : quote.getOrders()) {
+                out.debug("Description - " + order.getDesc());
+                out.debug("   Quantity - " + order.getQuantity() + order.getQtyUnit());
+                out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
+                out.debug("  Ext Price - " + order.getAmount());
+            }
+            quote.setTotal(lines[orderends[orderends.length-1]+4]);
+            quote.setSubtotal(quote.getTotal());
+            quote.setSNH(0);
+            quote.setTax(0);
+            out.debug("      Total - " + quote.getTotal());
         }
     }
     private void wslCommand(File file) {
