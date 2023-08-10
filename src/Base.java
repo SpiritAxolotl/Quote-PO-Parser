@@ -132,6 +132,11 @@ public abstract class Base {
         int b = findSpecificThing(strings, target2);
         return getMinPositiveValue(a,b);
     }
+    public int findTwoSpecificThing(String[] strings, String target, String target2, int index) {
+        int a = findSpecificThing(strings, target, index);
+        int b = findSpecificThing(strings, target2, index);
+        return getMinPositiveValue(a,b);
+    }
     public int findSpecificThing(ArrayList<String> strings, String target) {
         return findSpecificThing(stringArrayListToArray(strings), target);
     }
@@ -323,5 +328,25 @@ public abstract class Base {
             }
         }
         return false;
+    }
+    public int numTextClumps(String[] strs, int index) {
+        //start in a blank space.
+        int i = index;
+        boolean tracker = true;
+        int count = 0;
+        while (!strs[i].matches("\\$|\\d+")) {
+            if (!strs[i].isBlank()) {
+                if (tracker) {
+                    count++;
+                    tracker = false;
+                }
+            } else {
+                if (!tracker) {
+                    tracker = true;
+                }
+            }
+            i++;
+        }
+        return count;
     }
 }

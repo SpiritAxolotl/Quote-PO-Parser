@@ -426,7 +426,7 @@ public class WSL extends Base {
             out.debug("  Ship Date - " + quote.getDateString());
             out.debug("     Vendor - " + quote.getVendor());
             //keep track of the orders when we get to them
-            int ordertrack = 0;
+            //int ordertrack = 0;
             ArrayList<Order> orderlist = new ArrayList<Order>();
             int[] orderends = instancesOfRegex(lines, "_{5,}");
             for (int i=0; i<orderends.length; i++) {
@@ -434,10 +434,14 @@ public class WSL extends Base {
             }
             //do this for every page
             index = findThing(lines, findSpecificThing(lines, "Catalog Nbr")+1);
-            for (ordertrack=0; ordertrack<orderends.length; ordertrack++) {
+            for (int ordertrack=0; ordertrack<orderends.length; ordertrack++) {
+                if (ordertrack > 0) {
+                    index = orderends[ordertrack-1]+1;
+                }
                 Order order = orderlist.get(ordertrack);
                 boolean toggle = true;
-                while (index<orderends[ordertrack]) {
+                boolean[] trackers = {true, true, true, true, true};
+                while (index<orderends[ordertrack]-1) {
                     //skips lines that have standard stuff we don't want to parse
                     if (equalsAny(lines[index], new String[] {
                             "Item/Type Quantity",
@@ -451,6 +455,7 @@ public class WSL extends Base {
                         containsAny(lines[index], new String[] {
                             "UPC #",
                             "GB Part #",
+                            "Ship From",
                             "Item Note"
                         })
                     ){
@@ -462,47 +467,63 @@ public class WSL extends Base {
                         index++;
                         continue;
                     }
+                    //breaks if it's the end of the page
+                    if (lines[index].contains("This equipment and")) {
+                        //index = findTwoSpecificThing(lines, "Proposal", "Invoice", index);
+                        break;
+                    }
                     //UoM
-                    if (lines[index].matches("\\d+")) {
+                    if (lines[index].matches("\\d+") && trackers[0]) {
                         if (lines[index+1].contains("GB Part #:")) {
                             index++;
                         } else {
                             order.setRateUnit(lines[index]);
+                            trackers[0] = false;
                         }
                     //Quantity / Unit
-                    } else if (lines[index].matches("\\d+ EA .+")){
+                    } else if (lines[index].matches("\\d+ EA .+") && trackers[1]){
                         order.setQuantity(lines[index].substring(0, lines[index].indexOf(" ", lines[index].indexOf(" ")+1)));
-                        if (ordertrack % 2 == 0) {
-                            index = findThing(lines, findNotThing(lines, index+2))-1;
-                        } else {
-                            index = findThing(lines, findNotThing(lines, index))-1;
+                        trackers[1] = false;
+                        if (numTextClumps(lines, index) > 1) {
+                            if (ordertrack % 2 == 0) {
+                                index = findThing(lines, findNotThing(lines, index+2))-1;
+                            } else {
+                                index = findThing(lines, findNotThing(lines, index))-1;
+                            }
                         }
                     //Unit Price and Ext Price
                     } else if (!lines[index].isBlank() && lines[index].substring(0,1).equals("$")) {
                         //Unit Price
-                        if (toggle) {
+                        if (toggle && trackers[2]) {
                             order.setRate(lines[index]);
                             toggle = false;
+                            trackers[2] = false;
                         //Ext Price
-                        } else {
+                        } else if (trackers[3]) {
                             order.setAmount(lines[index]);
+                            trackers[3] = false;
                         }
                     //Description
-                    } else if (!lines[index].isBlank()) {
+                    } else if (!lines[index].isBlank() && trackers[4] && !lines[index].equals("ELECTRICAL")) {
                         order.setDesc(lines[index]);
+                        trackers[4] = false;
                         index++;
                         while (!lines[index].isBlank()){
                             order.appendDesc(lines[index]);
                             index++;
                         }
-                        if (ordertrack % 2 == 0) {
-                            index = findThing(lines, findNotThing(lines, index))-1;
-                        } else {
-                            index = findThing(lines, findNotThing(lines, index+2))-1;
+                        if (numTextClumps(lines, index) > 1) {
+                            if (ordertrack % 2 == 0) {
+                                index = findThing(lines, findNotThing(lines, index))-1;
+                            } else {
+                                index = findThing(lines, findNotThing(lines, index+2))-1;
+                            }
                         }
-                        continue;
                     }
                     index++;
+                    if (!(trackers[0] || trackers[1] || trackers[2] || trackers[3] || trackers[4])) {
+                        break;
+                    }
                 }
             }
             quote.addOrders(orderlist);
