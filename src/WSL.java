@@ -412,6 +412,37 @@ public class WSL extends Base {
             //out.debug("      Total - " + quote.getTotal());
         } else if (type == 2) {
             quote.setVendor("Graybar");
+            quote.setID(lines[findThing(lines, findSpecificThing(lines, "GB Quote #:")+1)]);
+            quote.setDate(lines[findThing(lines, findSpecificThing(lines, "Date:")+1)]);
+            p = instancesOf(lines, lines[findTwoSpecificThing(lines, "Invoice", "Proposal")]);
+            int t = findSpecificThing(lines, "Total in USD");
+            int plength = p.length;
+            //experimental as hell. make sure this works.
+            for (int i=0; i<p.length; i++) {
+                if (t < p[i]) {
+                    plength = i-1;
+                    break;
+                }
+            }
+            pageBounds = new int[plength];
+            for (int i=1; i<pageBounds.length; i++) {
+                pageBounds[i-1] = p[i];
+            }
+            pageBounds[pageBounds.length-1] = t;
+            //boolean[] toggles = {false, false, false, true};
+            //keep track of the orders when we get to them
+            int ordertrack = 0;
+            //int ordersync = 0;
+            ArrayList<Order> orderlist = new ArrayList<Order>();
+            int ordersize = instancesOfRegex(lines, "_{5,}").length-1;
+            for (int i=0; i<ordersize; i++) {
+                orderlist.add(new Order(false));
+            }
+            //do this for every page
+            index = findThing(lines, findSpecificThing(lines, "Catalog Nbr")+1);
+            for (int pb=0; pb<plength; pb++) {
+                
+            }
         }
     }
     private void wslCommand(File file) {

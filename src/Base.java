@@ -188,6 +188,16 @@ public abstract class Base {
         return intArrayListToArray(ints);
     }
     
+    public int[] instancesOfRegex(String[] str, String regex) {
+        ArrayList<Integer> ints = new ArrayList<Integer>();
+        for (int i=0; i<str.length; i++) {
+            if (str[i].matches(regex)) {
+                ints.add(i);
+            }
+        }
+        return intArrayListToArray(ints);
+    }
+    
     public static boolean match(String regex, String match){
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(match);
