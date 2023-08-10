@@ -32,10 +32,14 @@ public class Quote extends Base {
     }
     public int setID(String id) {
         int oldID = this.id;
+        String cleanID = id;
+        if (id.contains(" ")) {
+            cleanID = id.substring(0, id.indexOf(" "));
+        }
         if (id.substring(0,1).equals("S")) {
-            this.setID(Integer.parseInt(id.substring(1)));
+            this.setID(Integer.parseInt(cleanID.substring(1)));
         } else {
-            this.setID(Integer.parseInt(id));
+            this.setID(Integer.parseInt(cleanID));
         }
         return oldID;
     }

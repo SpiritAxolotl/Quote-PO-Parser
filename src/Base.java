@@ -289,4 +289,28 @@ public abstract class Base {
         }
         return clean;
     }
+    public boolean equalsAny(String str, String[] list) {
+        for (String s : list) {
+            if (str.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean matchesAny(String str, String[] list) {
+        for (String s : list) {
+            if (str.matches(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean containsAny(String str, String[] list) {
+        for (String s : list) {
+            if (str.contains(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

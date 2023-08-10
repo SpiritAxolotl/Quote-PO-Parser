@@ -414,35 +414,66 @@ public class WSL extends Base {
             quote.setVendor("Graybar");
             quote.setID(lines[findThing(lines, findSpecificThing(lines, "GB Quote #:")+1)]);
             quote.setDate(lines[findThing(lines, findSpecificThing(lines, "Date:")+1)]);
-            p = instancesOf(lines, lines[findTwoSpecificThing(lines, "Invoice", "Proposal")]);
-            int t = findSpecificThing(lines, "Total in USD");
-            int plength = p.length;
-            //experimental as hell. make sure this works.
-            for (int i=0; i<p.length; i++) {
-                if (t < p[i]) {
-                    plength = i-1;
-                    break;
-                }
-            }
-            pageBounds = new int[plength];
-            for (int i=1; i<pageBounds.length; i++) {
-                pageBounds[i-1] = p[i];
-            }
-            pageBounds[pageBounds.length-1] = t;
-            //boolean[] toggles = {false, false, false, true};
             //keep track of the orders when we get to them
             int ordertrack = 0;
-            //int ordersync = 0;
             ArrayList<Order> orderlist = new ArrayList<Order>();
-            int ordersize = instancesOfRegex(lines, "_{5,}").length-1;
-            for (int i=0; i<ordersize; i++) {
+            int[] orderends = instancesOfRegex(lines, "_{5,}");
+            for (int i=0; i<orderends.length; i++) {
                 orderlist.add(new Order(false));
             }
             //do this for every page
             index = findThing(lines, findSpecificThing(lines, "Catalog Nbr")+1);
-            for (int pb=0; pb<plength; pb++) {
-                
+            for (ordertrack=0; ordertrack<orderends.length; ordertrack++) {
+                Order order = orderlist.get(ordertrack);
+                boolean toggle = true;
+                while (index<orderends[ordertrack]) {
+                    if (equalsAny(lines[index], new String[] {
+                            "Item/Type Quantity",
+                            "Supplier",
+                            "Catalog Nbr",
+                            "Description",
+                            "Price",
+                            "Unit",
+                            "Ext.Price"
+                        }) ||
+                        containsAny(lines[index], new String[] {
+                            "UPC #",
+                            "GB Part #"
+                        })
+                    ){
+                        index += 2;
+                        continue;
+                    }
+                    if (lines[index].matches("\\d+")) {
+                        if (lines[index+1].contains("GB Part #:")) {
+                            index++;
+                        } else {
+                            order.setRateUnit(lines[index]);
+                        }
+                    } else if (lines[index].matches("\\d+ \\w{2} .+")){
+                        order.setQuantity(lines[index].substring(0, lines[index].indexOf(" ", lines[index].indexOf(" ")+1)));
+                        while (!lines[index].isBlank()){
+                            index++;
+                        }
+                    } else if (!lines[index].isBlank() && lines[index].substring(0,1).equals("$")) {
+                        if (toggle) {
+                            order.setRate(lines[index]);
+                            toggle = false;
+                        } else {
+                            order.setAmount(lines[index]);
+                        }
+                    } else if (!lines[index].isBlank()) {
+                        order.setDesc(lines[index]);
+                        while (!lines[index].isBlank()){
+                            index++;
+                            order.appendDesc(lines[index]);
+                        }
+                        continue;
+                    }
+                    index++;
+                }
             }
+            quote.addOrders(orderlist);
         }
     }
     private void wslCommand(File file) {

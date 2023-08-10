@@ -53,7 +53,7 @@ public class Order extends Base {
             int i = 1;
             try {
                 while (i<quantity.length()) {
-                    this.setQuantity(Integer.parseInt(cleanQty.substring(0,i)));
+                    Integer.parseInt(cleanQty.substring(0,i));
                     i++;
                 }
             } catch (NullPointerException | NumberFormatException er) {
@@ -66,7 +66,7 @@ public class Order extends Base {
     }
     public String setQtyUnit(String qtyunit) {
         String oldQtyUnit = this.qtyunit;
-        this.qtyunit = qtyunit.toLowerCase();
+        this.qtyunit = qtyunit.toLowerCase().strip();
         return oldQtyUnit;
     }
     public double getRate() {
@@ -82,8 +82,8 @@ public class Order extends Base {
     }
     public double setRate(String rate) {
         double oldRate = this.rate;
-        String cleanRate = rate.strip().replaceAll(",", "").replaceAll("\"", "");
-        if (this.type) {
+        String cleanRate = rate.strip().replaceAll(",", "").replaceAll("\"", "").replaceAll("$", "");
+        if (this.type || (cleanRate.length() > 0 && cleanRate.substring(cleanRate.length()-1).matches("\\d"))) {
             this.setRate(Double.parseDouble(cleanRate));
         } else {
             String[] split = cleanRate.split("\\/| ");
@@ -115,7 +115,7 @@ public class Order extends Base {
     }
     public double setAmount(String amount) {
         double oldAmount = this.rate;
-        String cleanAmount = amount.strip().replaceAll(",", "").replaceAll("\"", "");
+        String cleanAmount = amount.strip().replaceAll(",", "").replaceAll("\"", "").replaceAll("$", "");
         this.setAmount(Double.parseDouble(cleanAmount));
         return oldAmount;
     }
