@@ -174,7 +174,6 @@ public class Tabula extends Base {
             out.debug("       Memo - " + po.getMemo());
             out.debug("      Total - $" + po.getTotal());
         }
-        out.println();
         return po.isValid(out);
     }
 }

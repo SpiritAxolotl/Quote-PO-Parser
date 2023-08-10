@@ -410,8 +410,9 @@ public class WSL extends Base {
             //out.debug("        S&H - " + quote.getSNH());
             //out.debug("        Tax - " + quote.getTax());
             //out.debug("      Total - " + quote.getTotal());
+        } else if (type == 2) {
+            quote.setVendor("Graybar");
         }
-        out.println();
     }
     private void wslCommand(File file) {
         try {
