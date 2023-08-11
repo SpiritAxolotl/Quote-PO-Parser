@@ -440,7 +440,7 @@ public class WSL extends Base {
                 }
                 Order order = orderlist.get(ordertrack);
                 boolean toggle = true;
-                boolean[] trackers = {true, true, true, true, true};
+                boolean[] trackers = {true, true, true, true, true, true};
                 while (index<orderends[ordertrack]-1) {
                     //skips lines that have standard stuff we don't want to parse
                     if (equalsAny(lines[index], new String[] {
@@ -450,13 +450,16 @@ public class WSL extends Base {
                             "Description",
                             "Price",
                             "Unit",
-                            "Ext.Price"
+                            "Ext.Price",
+                            "Proposal",
+                            "Invoice"
                         }) ||
                         containsAny(lines[index], new String[] {
                             "UPC #",
                             "GB Part #",
                             "Ship From",
-                            "Item Note"
+                            "Item Note",
+                            "We Appreciate Your Request"
                         })
                     ){
                         index = findThing(lines, findNotThing(lines, index));
@@ -470,27 +473,28 @@ public class WSL extends Base {
                     //breaks if it's the end of the page
                     if (lines[index].contains("This equipment and")) {
                         //index = findTwoSpecificThing(lines, "Proposal", "Invoice", index);
-                        break;
+                        if (trackers[0] || trackers[1] || trackers[2] || trackers[3] || trackers[4]) {
+                            index = findTwoSpecificThing(lines, "Proposal", "Invoice", index)+2;
+                        } else {
+                            break;
+                        }
                     }
                     //UoM
                     if (lines[index].matches("\\d+") && trackers[0]) {
-                        if (lines[index+1].contains("GB Part #:")) {
+                        if (lines[index+1].contains("GB Part #:") || !lines[index].matches("10*")) {
                             index++;
                         } else {
                             order.setRateUnit(lines[index]);
                             trackers[0] = false;
                         }
                     //Quantity / Unit
-                    } else if (lines[index].matches("\\d+ EA .+") && trackers[1]){
-                        order.setQuantity(lines[index].substring(0, lines[index].indexOf(" ", lines[index].indexOf(" ")+1)));
-                        trackers[1] = false;
-                        if (numTextClumps(lines, index) > 1) {
-                            if (ordertrack % 2 == 0) {
-                                index = findThing(lines, findNotThing(lines, index+2))-1;
-                            } else {
-                                index = findThing(lines, findNotThing(lines, index))-1;
-                            }
+                    } else if (lines[index].matches("\\d+ EA($| .+)") && trackers[1]) {
+                        if (instancesOf(lines[index], " ") > 1) {
+                            order.setQuantity(lines[index].substring(0, lines[index].indexOf(" ", lines[index].indexOf(" ")+1)));
+                        } else {
+                            order.setQuantity(lines[index]);
                         }
+                        trackers[1] = false;
                     //Unit Price and Ext Price
                     } else if (!lines[index].isBlank() && lines[index].substring(0,1).equals("$")) {
                         //Unit Price
@@ -504,20 +508,17 @@ public class WSL extends Base {
                             trackers[3] = false;
                         }
                     //Description
-                    } else if (!lines[index].isBlank() && trackers[4] && !lines[index].equals("ELECTRICAL")) {
-                        order.setDesc(lines[index]);
-                        trackers[4] = false;
-                        index++;
-                        while (!lines[index].isBlank()){
+                    } else if (!lines[index].isBlank() && (trackers[4] || trackers[5]) && !lines[index].equals("ELECTRICAL")) {
+                        if (trackers[4]) {
+                            order.setDesc(lines[index]);
+                            trackers[4] = false;
+                            index++;
+                        } else {
+                            trackers[5] = false;
+                        }
+                        while (!lines[index].isBlank()) {
                             order.appendDesc(lines[index]);
                             index++;
-                        }
-                        if (numTextClumps(lines, index) > 1) {
-                            if (ordertrack % 2 == 0) {
-                                index = findThing(lines, findNotThing(lines, index))-1;
-                            } else {
-                                index = findThing(lines, findNotThing(lines, index+2))-1;
-                            }
                         }
                     }
                     index++;

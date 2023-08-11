@@ -204,6 +204,16 @@ public abstract class Base {
         return intArrayListToArray(ints);
     }
     
+    public int instancesOf(String str, String match) {
+        int count = 0;
+        for (int i=0; i<str.length()-1; i++) {
+            if (str.substring(i,i+1).equals(match)) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
     public int[] instancesOfRegex(String[] str, String regex) {
         ArrayList<Integer> ints = new ArrayList<Integer>();
         for (int i=0; i<str.length; i++) {
