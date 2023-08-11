@@ -55,6 +55,31 @@ public class WSL extends Base {
             } else {
                 linebreaks = 0;
             }
+            if (type == 2 && line.contains("-----") && !line.matches("^-{5,}$")) {
+                String newline;
+                if (line.matches("^-{5,}[^-]+")) {
+                    //find point at which- lastIndexOf("-") actually nah
+                    int separation = whenStopRepeating(line, "-", true);
+                    newline = line.substring(0, separation);
+                    lines.add(newline);
+                    out.println(k + ": " + newline);
+                    k++;
+                    newline = line.substring(separation);
+                    lines.add(newline);
+                    out.println(k + ": " + newline);
+                } else if (line.matches("[^-]+-{5,}$")) {
+                    int separation = whenStopRepeating(line, "-", false);
+                    newline = line.substring(0, separation);
+                    lines.add(newline);
+                    out.println(k + ": " + newline);
+                    k++;
+                    newline = line.substring(separation);
+                    lines.add(newline);
+                    out.println(k + ": " + newline);
+                }
+                new Object();
+                continue;
+            }
             lines.add(line);
             out.println(k + ": " + line);
         }
@@ -412,8 +437,8 @@ public class WSL extends Base {
             out.debug("      Total - " + quote.getTotal());
         } else if (type == 2) {
             quote.setVendor("Graybar");
-            quote.setID(lines[findThing(lines, findSpecificThing(lines, "GB Quote #:")+1)]);
-            quote.setDate(lines[findThing(lines, findSpecificThing(lines, "Date:")+1)]);
+            quote.setID(lines[findNextValue(lines, findSpecificThing(lines, "GB Quote #:")+1, false)]);
+            quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "Date:")+1)]);
             try {
                 out.debug(file.getParentFile().getName());
                 quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
@@ -428,7 +453,7 @@ public class WSL extends Base {
             //keep track of the orders when we get to them
             //int ordertrack = 0;
             ArrayList<Order> orderlist = new ArrayList<Order>();
-            int[] orderends = instancesOfRegex(lines, "_{5,}");
+            int[] orderends = instancesOfRegex(lines, "_{5,}|(-{5,}.*)");
             for (int i=0; i<orderends.length; i++) {
                 orderlist.add(new Order(false));
             }
@@ -459,7 +484,8 @@ public class WSL extends Base {
                             "GB Part #",
                             "Ship From",
                             "Item Note",
-                            "We Appreciate Your Request"
+                            "We Appreciate Your Request",
+                            "SPEC SHEET"
                         })
                     ){
                         index = findThing(lines, findNotThing(lines, index));
@@ -534,7 +560,8 @@ public class WSL extends Base {
                 out.debug(" Unit Price - " + order.getRate() + "/" + order.getRateUnit());
                 out.debug("  Ext Price - " + order.getAmount());
             }
-            quote.setTotal(lines[orderends[orderends.length-1]+4]);
+            index = findNextValue(lines, orderends[orderends.length-1]+1, true);
+            quote.setTotal(lines[index]);
             quote.setSubtotal(quote.getTotal());
             quote.setSNH(0);
             quote.setTax(0);

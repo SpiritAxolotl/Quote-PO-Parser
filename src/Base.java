@@ -46,13 +46,17 @@ public abstract class Base {
         return strings;
     }
     
-    public int findNextValue(String[] strings, int index, boolean quote) {
+    public int findNextValue(String[] strings, int index, boolean isDollar) {
         for(int i=index; i<strings.length; i++) {
+            String newstring = strings[i];
+            if (strings[i].contains(" ") && !isDollar) {
+                newstring = strings[i].substring(strings[i].indexOf(" "));
+            }
             try {
-                if (quote && strings[i].length()>0) {
-                    Integer.parseInt(strings[i].substring(1));
+                if (isDollar && strings[i].length()>1) {
+                    Double.parseDouble(strings[i].substring(1));
                 } else {
-                    Integer.parseInt(strings[i]);
+                    Double.parseDouble(newstring);
                 }
                 return i;
             } catch (NumberFormatException e) {}
@@ -325,7 +329,7 @@ public abstract class Base {
     }
     public boolean matchesAny(String str, String[] list) {
         for (String s : list) {
-            if (str.matches(s)) {
+            if (str.toLowerCase().matches(s.toLowerCase())) {
                 return true;
             }
         }
@@ -333,7 +337,7 @@ public abstract class Base {
     }
     public boolean containsAny(String str, String[] list) {
         for (String s : list) {
-            if (str.contains(s)) {
+            if (str.toLowerCase().contains(s.toLowerCase())) {
                 return true;
             }
         }
@@ -358,5 +362,24 @@ public abstract class Base {
             i++;
         }
         return count;
+    }
+    public int whenStopRepeating(String str, String matcher, boolean fromBeginning) {
+        if (str.length() <= matcher.length()) {
+            return -1;
+        }
+        if (fromBeginning) {
+            for (int i=0; i<str.length()-matcher.length(); i++) {
+                if (!str.substring(i, i+matcher.length()).equals(matcher)) {
+                    return i;
+                }
+            }
+        } else {
+            for (int i=str.length(); i>matcher.length(); i--) {
+                if (!str.substring(i-matcher.length(), i).equals(matcher)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 }
