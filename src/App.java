@@ -104,7 +104,7 @@ public class App extends Base {
                         out.println("File parsed correctly!\n");
                     } catch (Exception e) {
                         filesNotRead.add(aPDF.getPath());
-                        out.println("File didn't parse correctly! Do this one manually.\n");
+                        out.println("File didn't parse correctly! Do this one manually.\nDebug: PO\n");
                     }
                 } else {
                     boolean a = true;
@@ -117,7 +117,7 @@ public class App extends Base {
                             out.println("File parsed correctly!\n");
                         } catch (Exception e) {
                             filesNotRead.add(aPDF.getPath());
-                            out.println("File didn't parse correctly! Do this one manually.\n");
+                            out.println("File didn't parse correctly! Do this one manually.\nDebug: AED\n");
                         }
                     } else if (match(matchList[2], (aPDF.getName()))) {
                         out.println("Matches! Type is World Electric");
@@ -128,7 +128,7 @@ public class App extends Base {
                             out.println("File parsed correctly!\n");
                         } catch (Exception e) {
                             filesNotRead.add(aPDF.getPath());
-                            out.println("File didn't parse correctly! Do this one manually.\n");
+                            out.println("File didn't parse correctly! Do this one manually.\nDebug: World Electric\n");
                         }
                     } else if (match(matchList[3], (aPDF.getName()))) {
                         out.println("Matches! Type is Graybar");
@@ -136,15 +136,21 @@ public class App extends Base {
                             Quote quote = wsl.readTables(aPDF, 2);
                             quotes.add(quote);
                             filesRead.add(aPDF.getPath());
+                            out.println("File parsed correctly!\n");
+                        } catch (Exception e) {
+                            filesNotRead.add(aPDF.getPath());
+                            out.println("File didn't parse correctly! Do this one manually.\nDebug: Graybar\n");
+                        }
+                    } else if (match(matchList[4], (aPDF.getName()))) {
+                        try {
+                            Quote quote = wsl.readTables(aPDF, 3);
+                            quotes.add(quote);
+                            filesRead.add(aPDF.getPath());
                             out.println("File not configured yet. Working on it now.\n");
                         } catch (Exception e) {
                             filesNotRead.add(aPDF.getPath());
-                            out.println("File didn't parse correctly! Do this one manually.\n");
+                            out.println("File didn't parse correctly! Do this one manually.\nDebug: City Electric\n");
                         }
-                    } else if (match(matchList[4], (aPDF.getName()))) {
-                        out.println("Matches! Type is City Electric");
-                        out.println("File not configured yet! (Davey's fault). Do this one manually.\n");
-                        filesNotRead.add(aPDF.getPath());
                     } else {
                         out.println("File didn't match.\n");
                         if (aPDF.getName().substring(aPDF.getName().lastIndexOf(".")+1).toLowerCase().equals("pdf")) {
