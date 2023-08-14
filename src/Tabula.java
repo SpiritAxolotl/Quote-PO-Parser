@@ -1,6 +1,7 @@
 //code stolen from https://github.com/tabulapdf/tabula-java and HEAVILY modified by Davey
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,15 +26,7 @@ public class Tabula extends Base {
     }
     public void tabulaRead(File file) throws IOException {
         //written by not me
-        InputStream in = this.getClass()
-                        .getClassLoader()
-                        .getResourceAsStream(
-                            file.getPath()
-                            .substring(
-                                file.getPath()
-                                .indexOf("\\")+1
-                            )
-                        );
+        InputStream in = new FileInputStream(file);
         ArrayList<String> lines = new ArrayList<String>();
         //extract tables from document
         try (PDDocument document = PDDocument.load(in)) {
