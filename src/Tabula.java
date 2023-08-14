@@ -16,19 +16,24 @@ import technology.tabula.Table;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
 public class Tabula extends Base {
-    private Out out;
     private PO po;
     private String[] lines;
-    public Tabula(Out out) {
-        this.out = out;
-    }
+    
     public void clear() {
         lines = null;
         po = null;
     }
     public void tabulaRead(File file) throws IOException {
         //written by not me
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file.getPath().substring(file.getPath().indexOf("\\")+1));
+        InputStream in = this.getClass()
+                        .getClassLoader()
+                        .getResourceAsStream(
+                            file.getPath()
+                            .substring(
+                                file.getPath()
+                                .indexOf("\\")+1
+                            )
+                        );
         ArrayList<String> lines = new ArrayList<String>();
         //extract tables from document
         try (PDDocument document = PDDocument.load(in)) {
@@ -50,7 +55,9 @@ public class Tabula extends Base {
                             String text = content.getText().replaceAll("\r", " ").strip();
                             lines.add(text);
                             //pw.println(text);
-                            out.println(i + ": " + text);
+                            if (debug) {
+                                out.println(i + ": " + text);
+                            }
                             //poList.add(new PO());
                             i++;
                         }
@@ -65,7 +72,7 @@ public class Tabula extends Base {
             out.println("NullPointerException error. Ignoring...");
         }
     }
-    public PO readTables(File file, Out out) throws Exception {
+    public PO readTables(File file) throws Exception {
         if (file.exists()) {
             out.println("File exists!");
             //out.println("Debug: " + file.getPath().substring(file.getPath().indexOf("\\")+1));

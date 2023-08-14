@@ -29,6 +29,8 @@ public class App extends Base {
         }
         return 1;
     }
+    
+    //these two went unused rip
     public String[] findSuppliesPO(int id){
         PO po = poList.get(POIndexOfID(id));
         Order[] temp = po.getOrdersArray();
@@ -73,7 +75,15 @@ public class App extends Base {
     //fuck
     
     public static void main(String[] args) throws Exception {
-        Out out = new Out("src\\outputs\\output.txt");
+        if (debug) {
+            baseFilepath = "src\\";
+        } else {
+            Scanner scantemp = new Scanner(System.in);
+            System.out.println("Where ");
+            baseFilepath = scantemp.nextLine();
+            scantemp.close();
+        }
+        out = new Out("src\\outputs\\output.txt");
         PrintWriter outPOs = new PrintWriter("src\\outputs\\POs.csv");
         PrintWriter outQuotes = new PrintWriter("src\\outputs\\Quotes.csv");
         outPOs.println("PO #,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Quotes?");
@@ -85,8 +95,8 @@ public class App extends Base {
         }
         scan.close();
         String[] matchList = stringArrayListToArrayStatic(matchListt);
-        Tabula t = new Tabula(out);
-        WSL wsl = new WSL(out);
+        Tabula t = new Tabula();
+        WSL wsl = new WSL();
         //iterate through the files
         for (File folder : dir) {
             PO po = new PO();
@@ -97,7 +107,7 @@ public class App extends Base {
                 if (match(matchList[0], (aPDF.getName()))) {
                     out.println("Matches! Type is PO");
                     try {
-                        po = t.readTables(aPDF, out);
+                        po = t.readTables(aPDF);
                         poList.add(po);
                         t.clear();
                         filesRead.add(aPDF.getPath());
@@ -105,6 +115,7 @@ public class App extends Base {
                     } catch (Exception e) {
                         filesNotRead.add(aPDF.getPath());
                         out.println("File didn't parse correctly! Do this one manually.\nDebug: PO\n");
+                        t.clear();
                     }
                 } else {
                     boolean a = true;

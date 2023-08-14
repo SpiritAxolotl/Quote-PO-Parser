@@ -10,12 +10,9 @@ public class WSL extends Base {
     private String[] lines;
     private Quote quote;
     private int index;
-    private Out out;
     private int type;
     private File file;
-    public WSL(Out out) {
-        this.out = out;
-    }
+    
     public void clear() {
         lines = null;
         quote = null;
@@ -56,7 +53,9 @@ public class WSL extends Base {
                 linebreaks = 0;
             }
             lines.add(line);
-            out.println(k + ": " + line);
+            if (debug) {
+                out.println(k + ": " + line);
+            }
         }
         scan.close();
         new File("src\\temp.txt").delete();
