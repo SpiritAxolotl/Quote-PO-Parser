@@ -213,12 +213,13 @@ public class App extends Base {
         filesReadOut.println("TOTAL NOT READ FILES: " + filesNotRead.size());
         out.println("TOTAL FILES: " + totalFiles);
         filesReadOut.println("TOTAL FILES: " + totalFiles);
-        out.lnprintln("PERCENT OF FILES NOT READ: " + formatDouble((double)(filesNotRead.size())*100.0/totalFiles) + "%");
-        filesReadOut.println("\nPERCENT OF FILES NOT READ: " + formatDouble((double)(filesNotRead.size())*100.0/totalFiles) + "%");
+        out.lnprintln("\nPERCENT OF FILES NOT READ: " + formatDouble((double)(filesNotRead.size())*100.0/totalFiles) + "%");
+        filesReadOut.println("\n\nPERCENT OF FILES NOT READ: " + formatDouble((double)(filesNotRead.size())*100.0/totalFiles) + "%");
         out.lnprintln("Program ended successfully!\n");
         filesReadOut.close();
         outPOs.close();
         outQuotes.close();
         out.close();
+        new File("temp.txt").delete();
     }
 }
