@@ -3,7 +3,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class App extends Base {
     static File[] dir = (new File("inputs\\pdfs\\")).listFiles();
@@ -83,6 +83,7 @@ public class App extends Base {
         PrintWriter outQuotes = new PrintWriter("outputs\\Quotes.csv");
         outPOs.println("PO #,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Quotes?");
         outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total");
+        /*
         ArrayList<String> matchListt = new ArrayList<String>();
         Scanner scan = new Scanner(new File("inputs\\matches.txt"));
         while (scan.hasNextLine()) {
@@ -90,6 +91,7 @@ public class App extends Base {
         }
         scan.close();
         String[] matchList = stringArrayListToArrayStatic(matchListt);
+        */
         Tabula t = new Tabula();
         WSL wsl = new WSL();
         //iterate through the files
@@ -99,7 +101,7 @@ public class App extends Base {
             for (File aPDF : folder.listFiles()) {
                 out.println("Current file: \"" + aPDF.getName() + "\"");
                 out.println("Filepath: \"" + aPDF.getPath() + "\"");
-                if (match(matchList[0], (aPDF.getName()))) {
+                if (match("PO_(\\d{4,})_from_Radiance_Solar_LLC_(\\d{5,})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                     out.println("Matches! Type is PO");
                     try {
                         po = t.readTables(aPDF);
@@ -114,7 +116,7 @@ public class App extends Base {
                     }
                 } else {
                     boolean a = true;
-                    if (match(matchList[1], (aPDF.getName()))) {
+                    if (match("S(\\d{7})-(\\d{4})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                         out.println("Matches! Type is AED");
                         try {
                             Quote quote = wsl.readTables(aPDF, 0);
@@ -125,7 +127,7 @@ public class App extends Base {
                             filesNotRead.add(aPDF.getPath());
                             out.println("File didn't parse correctly! Do this one manually.\nDebug: AED\n");
                         }
-                    } else if (match(matchList[2], (aPDF.getName()))) {
+                    } else if (match("S(\\d{7,})-(\\d{4})_(\\d{4,5})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                         out.println("Matches! Type is World Electric");
                         try {
                             Quote quote = wsl.readTables(aPDF, 1);
@@ -136,7 +138,7 @@ public class App extends Base {
                             filesNotRead.add(aPDF.getPath());
                             out.println("File didn't parse correctly! Do this one manually.\nDebug: World Electric\n");
                         }
-                    } else if (match(matchList[3], (aPDF.getName()))) {
+                    } else if (match("Graybar Quotation.+?\\.pdf", (aPDF.getName()))) {
                         out.println("Matches! Type is Graybar");
                         try {
                             Quote quote = wsl.readTables(aPDF, 2);
@@ -147,7 +149,7 @@ public class App extends Base {
                             filesNotRead.add(aPDF.getPath());
                             out.println("File didn't parse correctly! Do this one manually.\nDebug: Graybar\n");
                         }
-                    } else if (match(matchList[4], (aPDF.getName()))) {
+                    } else if (match("Quotation REG_(\\d{5})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                         try {
                             Quote quote = wsl.readTables(aPDF, 3);
                             quotes.add(quote);
