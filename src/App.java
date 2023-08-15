@@ -77,6 +77,8 @@ public class App extends Base {
     public static void main(String[] args) throws Exception {
         if (args.length > 0 && args[0].equals("debug")) {
             debug = true;
+        } else {
+            debug = false;
         }
         out = new Out("outputs\\output.txt");
         PrintWriter outPOs = new PrintWriter("outputs\\POs.csv");

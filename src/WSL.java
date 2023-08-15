@@ -58,7 +58,7 @@ public class WSL extends Base {
             }
         }
         scan.close();
-        new File("src\\temp.txt").delete();
+        //new File("temp.txt").delete();
         return stringArrayListToArray(lines);
     }
     private void parse() {

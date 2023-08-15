@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Base {
-    static boolean debug = false;
+    static boolean debug;
     static Out out;
     
     public int[] intArrayListToArray(ArrayList<Integer> ints) {
