@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 public abstract class Base {
     static boolean debug = false;
-    static String baseFilepath;
     static Out out;
     
     public int[] intArrayListToArray(ArrayList<Integer> ints) {

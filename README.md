@@ -55,5 +55,5 @@ Here's what the inside of one of these folders looks like:
 So long as the structure is exactly like this, my program should be able to work properly (in the sense that it recognizes that the files exist).
 
 ## Running the program
-We finally got there! Open Terminal, type `java -jar` and a space, and drag the jar file onto the window (which will auto-fill its path). If your filepath has spaces in it, put doublequotes around the entire filepath. Press enter and it should run. Check `POs.csv` and `Quotes.csv` in the outputs folder after it has run, as well as `filesread.txt` to see what files had and had not been read.  
-If you need to rerun the program, just press the up key in Terminal to load the last used command.
+We finally got there! Open Terminal, type `cd` and a space, and drag the jar file onto the window (which will auto-fill its path). Delete Parser.jar from the end. If your filepath has spaces in it, put doublequotes around the entire filepath. Press enter. Then run `ls` and make sure that you see Parser.jar in the list. If so, run `java -jar Parser.jar`. If it gives you an error about "FileNotFoundException", you have the filepath wrong. Make sure you are directly in the folder that has the jar file. If the program works, check `POs.csv` and `Quotes.csv` in the outputs folder after it has run, as well as `filesread.txt` to see what files had and had not been read.  
+If you need to rerun the program, just press the up key in Terminal to load the last used commands. You will need to do this entire section again whenever you close Terminal.

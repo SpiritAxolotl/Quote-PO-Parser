@@ -2,14 +2,14 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+//import java.util.HashMap;
 //import java.util.Scanner;
 
 public class App extends Base {
     static File[] dir = (new File("inputs\\pdfs\\")).listFiles();
     static ArrayList<PO> poList = new ArrayList<PO>();
     static ArrayList<Quote> quoteList = new ArrayList<Quote>();
-    static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
+    //static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
     static ArrayList<String> filesNotRead = new ArrayList<String>();
     static ArrayList<String> filesRead = new ArrayList<String>();
     
