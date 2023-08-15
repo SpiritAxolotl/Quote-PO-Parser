@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class App extends Base {
-    static File[] dir = (new File("src\\inputs\\extracted\\")).listFiles();
+    static File[] dir = (new File("inputs\\pdfs\\")).listFiles();
     static ArrayList<PO> poList = new ArrayList<PO>();
     static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
@@ -75,21 +75,16 @@ public class App extends Base {
     //fuck
     
     public static void main(String[] args) throws Exception {
-        if (debug) {
-            baseFilepath = "src\\";
-        } else {
-            Scanner scantemp = new Scanner(System.in);
-            System.out.println("Where ");
-            baseFilepath = scantemp.nextLine();
-            scantemp.close();
+        if (args.length > 0 && args[0].equals("debug")) {
+            debug = true;
         }
-        out = new Out("src\\outputs\\output.txt");
-        PrintWriter outPOs = new PrintWriter("src\\outputs\\POs.csv");
-        PrintWriter outQuotes = new PrintWriter("src\\outputs\\Quotes.csv");
+        out = new Out("outputs\\output.txt");
+        PrintWriter outPOs = new PrintWriter("outputs\\POs.csv");
+        PrintWriter outQuotes = new PrintWriter("outputs\\Quotes.csv");
         outPOs.println("PO #,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Quotes?");
         outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total");
         ArrayList<String> matchListt = new ArrayList<String>();
-        Scanner scan = new Scanner(new File("src\\inputs\\matches.txt"));
+        Scanner scan = new Scanner(new File("inputs\\matches.txt"));
         while (scan.hasNextLine()) {
             matchListt.add(scan.nextLine());
         }
