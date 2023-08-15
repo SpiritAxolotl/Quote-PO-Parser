@@ -543,7 +543,7 @@ public class WSL extends Base {
     private void wslCommand(File file) {
         try {
             // Define the WSL command to run
-            String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"src/temp.txt\"";
+            String wslCommand = "wsl pdftotext \"" + file.getPath().replaceAll("\\\\", "/").replaceAll("\"", "\\\"") + "\" \"temp.txt\"";
             out.println("Running command \"" + wslCommand + "\"...");
             // Create a ProcessBuilder with the WSL command
             ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", wslCommand);

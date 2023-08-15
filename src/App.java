@@ -193,20 +193,30 @@ public class App extends Base {
         for (Quote quote : quoteList) {
             outQuotes.println(quote.toCSV());
         }
+        PrintWriter filesReadOut = new PrintWriter("outputs\\filesread.txt");
         out.println("FILES READ:");
+        filesReadOut.println("FILES READ:");
         for (String str : filesRead) {
             out.println("\\" + str);
+            filesReadOut.println("\\" + str);
         }
         out.lnprintln("FILES NOT READ:");
+        filesReadOut.println("FILES NOT READ:");
         for (String str : filesNotRead) {
             out.println("\\" + str);
+            filesReadOut.println("\\" + str);
         }
         int totalFiles = filesRead.size() + filesNotRead.size();
         out.lnprintln("\nTOTAL READ FILES: " + filesRead.size());
+        filesReadOut.println("\n\nTOTAL READ FILES: " + filesRead.size());
         out.println("TOTAL NOT READ FILES: " + filesNotRead.size());
+        filesReadOut.println("TOTAL NOT READ FILES: " + filesNotRead.size());
         out.println("TOTAL FILES: " + totalFiles);
+        filesReadOut.println("TOTAL FILES: " + totalFiles);
         out.lnprintln("PERCENT OF FILES NOT READ: " + formatDouble((double)(filesNotRead.size())*100.0/totalFiles) + "%");
+        filesReadOut.println("\nPERCENT OF FILES NOT READ: " + formatDouble((double)(filesNotRead.size())*100.0/totalFiles) + "%");
         out.lnprintln("Program ended successfully!\n");
+        filesReadOut.close();
         outPOs.close();
         outQuotes.close();
         out.close();
