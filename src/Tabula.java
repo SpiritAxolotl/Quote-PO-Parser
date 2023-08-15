@@ -1,11 +1,11 @@
 //code stolen from https://github.com/tabulapdf/tabula-java and HEAVILY modified by Davey
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -16,18 +16,18 @@ import technology.tabula.RectangularTextContainer;
 import technology.tabula.Table;
 import technology.tabula.extractors.SpreadsheetExtractionAlgorithm;
 
-//Vendor name, quote date, vendor quote number, our reference, product code, product description, quantity, unit price, total price per line.
 public class Tabula extends Base {
-    public PO readTables(File file, Out out) throws Exception {
-        if (file.exists()) {
-            out.println("File exists!");
-            //out.println("Debug: " + file.getPath().substring(file.getPath().indexOf("\\")+1));
-        } else {
-            out.println("File doesn't exist :(");
-        }
+    private PO po;
+    private String[] lines;
+    
+    public void clear() {
+        lines = null;
+        po = null;
+    }
+    public void tabulaRead(File file) throws IOException {
         //written by not me
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream(file.getPath().substring(file.getPath().indexOf("\\")+1));
-        PrintWriter pw = new PrintWriter("src\\temp.txt");
+        InputStream in = new FileInputStream(file);
+        ArrayList<String> lines = new ArrayList<String>();
         //extract tables from document
         try (PDDocument document = PDDocument.load(in)) {
             SpreadsheetExtractionAlgorithm sea = new SpreadsheetExtractionAlgorithm();
@@ -46,8 +46,11 @@ public class Tabula extends Base {
                         for (@SuppressWarnings("rawtypes") RectangularTextContainer content : cells) {
                             // Note: Cell.getText() uses \r to concat text chunks
                             String text = content.getText().replaceAll("\r", " ").strip();
-                            pw.println(text);
-                            out.println(i + ": " + text);
+                            lines.add(text);
+                            //pw.println(text);
+                            if (debug) {
+                                out.println(i + ": " + text);
+                            }
                             //poList.add(new PO());
                             i++;
                         }
@@ -56,24 +59,28 @@ public class Tabula extends Base {
                 }
             }
             oe.close();
-            pw.close();
+            this.lines = stringArrayListToArray(lines);
+            //pw.close();
         } catch (NullPointerException ex) {
             out.println("NullPointerException error. Ignoring...");
         }
+    }
+    public PO readTables(File file) throws Exception {
+        if (file.exists()) {
+            out.println("File exists!");
+            //out.println("Debug: " + file.getPath().substring(file.getPath().indexOf("\\")+1));
+        } else {
+            out.println("File doesn't exist :(");
+        }
+        tabulaRead(file);
         //all of this is davey's code:
         //Putting the inputs into a table
-        Scanner scan = new Scanner(new File("src\\temp.txt"));
-        ArrayList<String> linest = new ArrayList<String>();
-        while (scan.hasNextLine()) {
-            linest.add(scan.nextLine().trim());
-        }
-        scan.close();
-        String[] lines = stringArrayListToArray(linest);
         int lineSize = lines.length;
         //Parsing the stuff in the java table
         //Quote quote = new Quote();
-        PO po = new PO();
+        po = new PO();
         po.setID(lines[5]);
+        po.setQuoteNum(file.getParentFile().listFiles().length-1);
         po.setDate(lines[4]);
         po.setVendor(lines[7]);
         po.setPayTerms(lines[3]);
@@ -81,6 +88,7 @@ public class Tabula extends Base {
         out.debug("       Date - " + po.getDateString());
         out.debug("     Vendor - " + po.getVendor());
         out.debug("  Pay Terms - " + po.getPayTerms());
+        out.debug("    Quotes? - " + po.getQuoteNum());
         po.setMemo(lines[po.findSetTotal(lines)-1]);
         if (lineSize <= 40) {
             Order order = new Order(true);
@@ -166,7 +174,6 @@ public class Tabula extends Base {
             out.debug("       Memo - " + po.getMemo());
             out.debug("      Total - $" + po.getTotal());
         }
-        out.println();
         return po.isValid(out);
     }
 }

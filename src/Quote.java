@@ -32,13 +32,15 @@ public class Quote extends Base {
     }
     public int setID(String id) {
         int oldID = this.id;
-        try {
-            if (id.substring(0,1).equals("S")) {
-                this.setID(Integer.parseInt(id.substring(1)));
-            } else {
-            this.setID(Integer.parseInt(id));
-            }
-        } catch (NullPointerException | NumberFormatException er) {}
+        String cleanID = id;
+        if (id.contains(" ")) {
+            cleanID = id.substring(0, id.indexOf(" "));
+        }
+        if (id.substring(0,1).equals("S")) {
+            this.setID(Integer.parseInt(cleanID.substring(1)));
+        } else {
+            this.setID(Integer.parseInt(cleanID));
+        }
         return oldID;
     }
     public int getCustomerNum() {
@@ -51,9 +53,7 @@ public class Quote extends Base {
     }
     public int setCustomerNum(String custnum) {
         int oldNum = this.custnum;
-        try {
-            this.setCustomerNum(Integer.parseInt(custnum.strip()));
-        } catch (NullPointerException | NumberFormatException er) {}
+        this.setCustomerNum(Integer.parseInt(custnum.strip()));
         return oldNum;
     }
     public int[] getDate() {
@@ -95,9 +95,6 @@ public class Quote extends Base {
     }
     public String setVendor(String vendor) {
         String oldVendor = this.vendor;
-        /*if(vendor.contains("Atlanta Electrical Distributions"))
-            this.vendor = "AED";
-        else*/
         this.vendor = vendor;
         return oldVendor;
     }
@@ -108,6 +105,9 @@ public class Quote extends Base {
         return this.getOrder(0);
     }
     public Order getLastOrder() {
+        if (this.orders.size() == 0) {
+            return this.getOrder(0);
+        }
         return this.getOrder(this.orders.size()-1);
     }
     public Order[] getOrdersArray() {
@@ -230,8 +230,8 @@ public class Quote extends Base {
                 //this.getSubtotal(),
                 this.getSNH(),
                 this.getTax(),
-                this.getTotal(),
-                isBeginning
+                this.getTotal()
+                //isBeginning
             };
             if (isBeginning) {
                 isBeginning = false;
@@ -240,20 +240,20 @@ public class Quote extends Base {
         }
         return concat;
     }
-    public Quote isValid(Out out) throws NullPointerException {
-        if(
+    public Quote isValid(Out out, int type) throws NullPointerException {
+        if( (type == 0) && (
             this.getID() == -1 ||
             this.getCustomerNum() == -1 ||
             (this.getDate(0) == -1 || this.getDate(1) == -1 || this.getDate(2) == -1) ||
             this.getVendor().isBlank() ||
             this.getTotal() == -1
-        ){
+        )){
             String message = "Parameters missing: ";
             if (this.getID() == -1) {
                 message += "Quote Number, ";
             }
             if (this.getCustomerNum() == -1) {
-                message += "Customer PO Number, ";
+                message += "PO Number, ";
             }
             if (this.getDate(0) == -1 || this.getDate(1) == -1 || this.getDate(2) == -1) {
                 message += "Ship Date, ";
@@ -266,8 +266,7 @@ public class Quote extends Base {
             }
             message = message.substring(0, message.length()-2);
             out.println(message);
-            //out.close();
-            //throw new NullPointerException(message);
+            throw new NullPointerException(message);
         }
         return this;
     }

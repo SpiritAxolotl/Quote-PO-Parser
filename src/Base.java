@@ -6,6 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Base {
+    static boolean debug = true;
+    static Out out;
+    static String outputsfolder = "outputs\\";
+    static String inputsfolder = "inputs\\";
+    
     public int[] intArrayListToArray(ArrayList<Integer> ints) {
         int[] integers = new int[ints.size()];
         for (int i=0; i<ints.size(); i++) {
@@ -73,6 +78,14 @@ public abstract class Base {
         return -1;
     }
     
+    public int findNotThing(String[] strings, int index) {
+        for(int i=index; i<strings.length; i++) {
+            if (strings[i].isBlank()) {
+                return i;
+            }
+        }
+        return -1;
+    }
     public int findThing(String[] strings, int index) {
         for(int i=index; i<strings.length; i++) {
             if (!strings[i].isBlank()) {
@@ -94,6 +107,9 @@ public abstract class Base {
             index = thing + 1;
         }
         return index - 1;
+    }
+    public int findNotThing(ArrayList<String> strings, int index) {
+        return findNotThing(stringArrayListToArray(strings), index);
     }
     public int findThing(ArrayList<String> strings) {
         return findThing(stringArrayListToArray(strings));
@@ -119,6 +135,11 @@ public abstract class Base {
     public int findTwoSpecificThing(String[] strings, String target, String target2) {
         int a = findSpecificThing(strings, target);
         int b = findSpecificThing(strings, target2);
+        return getMinPositiveValue(a,b);
+    }
+    public int findTwoSpecificThing(String[] strings, String target, String target2, int index) {
+        int a = findSpecificThing(strings, target, index);
+        int b = findSpecificThing(strings, target2, index);
         return getMinPositiveValue(a,b);
     }
     public int findSpecificThing(ArrayList<String> strings, String target) {
@@ -182,6 +203,26 @@ public abstract class Base {
         ArrayList<Integer> ints = new ArrayList<Integer>();
         for (int i=0; i<str.length; i++) {
             if (str[i].equals(match)) {
+                ints.add(i);
+            }
+        }
+        return intArrayListToArray(ints);
+    }
+    
+    public int instancesOf(String str, String match) {
+        int count = 0;
+        for (int i=0; i<str.length()-1; i++) {
+            if (str.substring(i,i+1).equals(match)) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public int[] instancesOfRegex(String[] str, String regex) {
+        ArrayList<Integer> ints = new ArrayList<Integer>();
+        for (int i=0; i<str.length; i++) {
+            if (str[i].matches(regex)) {
                 ints.add(i);
             }
         }
@@ -269,7 +310,6 @@ public abstract class Base {
         return false;
     }
     
-    
     public String removeWeirdChars(String str) {
         return removeListedChars(str, new String[] {"\u0002", "\u0010", "\u0018", "\u0014"});
     }
@@ -279,5 +319,79 @@ public abstract class Base {
             clean = clean.replaceAll(i, "");
         }
         return clean;
+    }
+    public boolean equalsAny(String str, String[] list) {
+        for (String s : list) {
+            if (str.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean matchesAny(String str, String[] list) {
+        for (String s : list) {
+            if (str.matches(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean containsAny(String str, String[] list) {
+        for (String s : list) {
+            if (str.contains(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public int numTextClumps(String[] strs, int index) {
+        //start in a blank space.
+        int i = index;
+        boolean tracker = true;
+        int count = 0;
+        while (!strs[i].matches("\\$|\\d+")) {
+            if (!strs[i].isBlank()) {
+                if (tracker) {
+                    count++;
+                    tracker = false;
+                }
+            } else {
+                if (!tracker) {
+                    tracker = true;
+                }
+            }
+            i++;
+        }
+        return count;
+    }
+    public static String cleanFilePath(String str) {
+        String fp = str.replaceAll("/", "\\");
+        if (fp.length() > 0 &&
+            fp.substring(0,1).equals("\"") &&
+            fp.substring(fp.length()-1).equals("\"")
+        ){
+            fp = fp.substring(1, fp.length()-1);
+        }
+        if (!fp.substring(fp.length()-1).equals("\\")) {
+            fp += "\\";
+        }
+        return fp;
+    }
+    public static void options(String[] args) {
+        int length = args.length;
+        for (int i=0; i<length; i++) {
+            if (args[i].length() > 0 && args[i].equals("-")) {
+                String command = args[i].substring(1);
+                if (command.equals("debug")) {
+                    debug = true;
+                } else if (command.equals("source") && i+1 < length) {
+                    i++;
+                    inputsfolder = cleanFilePath(args[i]);
+                } else if (command.equals("destination") && i+1 < length) {
+                    i++;
+                    outputsfolder = cleanFilePath(args[i]);
+                }
+            }
+        }
     }
 }

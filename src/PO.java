@@ -8,6 +8,7 @@ public class PO extends Base {
     private double total;
     private String memo;
     private String payterms;
+    private int quotenum;
     public PO() {
         this.id = -1;
         this.date = new int[] {-1,-1,-1};
@@ -28,9 +29,7 @@ public class PO extends Base {
     }
     public int setID(String id) {
         int oldID = this.id;
-        try {
-            this.setID(Integer.parseInt(id));
-        } catch (NullPointerException | NumberFormatException er) {}
+        this.setID(Integer.parseInt(id));
         return oldID;
     }
     public int[] getDate() {
@@ -70,9 +69,9 @@ public class PO extends Base {
     public int[] setDate(String date) {
         int[] oldDate = this.date;
         String[] newDate = date.split("/");
-        for (int i=0;i<3;i++) { try {
+        for (int i=0;i<3;i++) {
             this.setDate(i, Integer.parseInt(newDate[i]));
-        } catch (NullPointerException | NumberFormatException er) {}}
+        }
         return oldDate;
     }
     public int findSetDate(ArrayList<String> strings) {
@@ -174,7 +173,7 @@ public class PO extends Base {
         return -1;
     }
     public double setTotal(String total) {
-        String cleanTotal = total.trim().replaceAll(",", "");
+        String cleanTotal = total.strip().replaceAll(",", "");
         return this.setTotal(
             Double.parseDouble(
                 cleanTotal.substring(
@@ -200,7 +199,14 @@ public class PO extends Base {
         this.payterms = payterms;
         return oldPayTerms;
     }
-    
+    public int getQuoteNum() {
+        return this.quotenum;
+    }
+    public int setQuoteNum(int quotenum) {
+        int oldQuoteNum = this.quotenum;
+        this.quotenum = quotenum;
+        return oldQuoteNum;
+    }
     public String toCSV() {
         String concat = "";
         boolean isBeginning = true;
@@ -217,7 +223,8 @@ public class PO extends Base {
                 this.getTotal(),
                 this.getMemo(),
                 this.getPayTerms(),
-                isBeginning
+                //isBeginning
+                this.getQuoteNum()
             };
             if (isBeginning) {
                 isBeginning = false; 
@@ -250,7 +257,6 @@ public class PO extends Base {
             }
             message = message.substring(0, message.length()-2);
             out.println(message);
-            out.close();
             throw new NullPointerException(message);
         }
         return this;
