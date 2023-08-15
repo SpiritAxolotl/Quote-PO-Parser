@@ -25,6 +25,9 @@ Haven't decided yet :P
 Probably GPL v3.0  
 I *might* pick something from the [Anti-License Manifesto](https://www.boringcactus.com/2021/09/29/anti-license-manifesto.html) if the higher-ups let me
 
+## Download the jar
+Go to "Releases" on the right, click on the latest release, and download the Parser.jar file (NOT the source code).
+
 ## Installing stuff
 ### wsl and pdftotext  
 Open Terminal (aka Command Prompt/Windows Powershell). Type `wsl` and agree to install it. Once it installs, restart your computer. Open Terminal again and type `wsl` again. Then run `sudo apt-get update && sudo apt-get install -y xpdf` and enter your password when it prompts you. Type `which pdftotext` (or `wsl which pdftotext` if you're not in wsl) to confirm you have it installed.
