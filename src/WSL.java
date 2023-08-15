@@ -20,6 +20,30 @@ public class WSL extends Base {
         index = 0;
         type = 0;
     }
+    private void parsePONumberAndRename() {
+        try {
+            String parentpath = file.getParent();
+            String parent = file.getParentFile().getName();
+            out.debug(parent);
+            quote.setCustomerNum(
+                Integer.parseInt(
+                    parent.substring(
+                        parent.indexOf("Purchase Order ") + 15,
+                        parent.indexOf("Purchase Order ") + 19
+                    )
+                )
+            );
+            if (!file.getName().matches("\\d{4} .+")) {
+                String newfilepath = parentpath + "\\" + quote.getCustomerNum() + " " + file.getName();
+                File newfile = new File(newfilepath);
+                file.renameTo(newfile);
+                file = new File(newfilepath);
+            }
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            out.debug("PO number parse fail");
+            quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
+        }
+    }
     private String[] arrayAndPrintStuff(String filepath, Out out) throws FileNotFoundException {
         Scanner scan = new Scanner(new File(filepath));
         ArrayList<String> lines = new ArrayList<String>();
@@ -66,13 +90,7 @@ public class WSL extends Base {
         int[] pageBounds;
         if (type == 0) {
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
-            try {
-                out.debug(file.getParentFile().getName());
-                quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
-            } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                out.debug("PO number parse fail");
-                quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
-            }
+            parsePONumberAndRename();
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
             quote.setVendor(lines[1]);
             out.debug("  Quote Num - " + quote.getID());
@@ -206,13 +224,7 @@ public class WSL extends Base {
             out.debug("      Total - " + quote.getTotal());
         } else if (type == 1) {
             quote.setID(lines[findNextValue(lines, findTwoSpecificThing(lines, "QUOTE NUMBER", "ORDER NUMBER"), true)]);
-            try {
-                out.debug(file.getParentFile().getName());
-                quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
-            } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                out.debug("PO number parse fail");
-                quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
-            }
+            parsePONumberAndRename();
             quote.setDate(lines[findNextDateValue(lines, findSpecificThing(lines, "SHIP DATE"))]);
             quote.setVendor(lines[1]);
             out.debug("  Quote Num - " + quote.getID());
@@ -413,13 +425,7 @@ public class WSL extends Base {
             quote.setVendor("Graybar");
             quote.setID(lines[findThing(lines, findSpecificThing(lines, "GB Quote #:")+1)]);
             quote.setDate(lines[findThing(lines, findSpecificThing(lines, "Date:")+1)]);
-            try {
-                out.debug(file.getParentFile().getName());
-                quote.setCustomerNum(Integer.parseInt(file.getParentFile().getName().substring(15,19)));
-            } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                out.debug("PO number parse fail");
-                quote.setCustomerNum(lines[findNextValue(lines, findSpecificThing(lines, "CUSTOMER NUMBER"), false)]);
-            }
+            parsePONumberAndRename();
             out.debug("  Quote Num - " + quote.getID());
             out.debug("     PO Num - " + quote.getCustomerNum());
             out.debug("  Ship Date - " + quote.getDateString());
@@ -571,7 +577,7 @@ public class WSL extends Base {
         this.type = type;
         this.file = filee;
         wslCommand(file);
-        lines = arrayAndPrintStuff("src\\temp.txt", out);
+        lines = arrayAndPrintStuff("temp.txt", out);
         //int lineSize = lines.length;
         //Parsing the stuff in the java table
         quote = new Quote();

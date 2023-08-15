@@ -6,8 +6,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Base {
-    static boolean debug;
+    static boolean debug = true;
     static Out out;
+    static String outputsfolder = "outputs\\";
+    static String inputsfolder = "inputs\\";
     
     public int[] intArrayListToArray(ArrayList<Integer> ints) {
         int[] integers = new int[ints.size()];
@@ -361,5 +363,35 @@ public abstract class Base {
             i++;
         }
         return count;
+    }
+    public static String cleanFilePath(String str) {
+        String fp = str.replaceAll("/", "\\");
+        if (fp.length() > 0 &&
+            fp.substring(0,1).equals("\"") &&
+            fp.substring(fp.length()-1).equals("\"")
+        ){
+            fp = fp.substring(1, fp.length()-1);
+        }
+        if (!fp.substring(fp.length()-1).equals("\\")) {
+            fp += "\\";
+        }
+        return fp;
+    }
+    public static void options(String[] args) {
+        int length = args.length;
+        for (int i=0; i<length; i++) {
+            if (args[i].length() > 0 && args[i].equals("-")) {
+                String command = args[i].substring(1);
+                if (command.equals("debug")) {
+                    debug = true;
+                } else if (command.equals("source") && i+1 < length) {
+                    i++;
+                    inputsfolder = cleanFilePath(args[i]);
+                } else if (command.equals("destination") && i+1 < length) {
+                    i++;
+                    outputsfolder = cleanFilePath(args[i]);
+                }
+            }
+        }
     }
 }

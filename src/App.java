@@ -6,7 +6,7 @@ import java.util.Arrays;
 //import java.util.Scanner;
 
 public class App extends Base {
-    static File[] dir = (new File("inputs\\pdfs\\")).listFiles();
+    static File[] dir = (new File(inputsfolder + "pdfs\\")).listFiles();
     static ArrayList<PO> poList = new ArrayList<PO>();
     static ArrayList<Quote> quoteList = new ArrayList<Quote>();
     //static HashMap<Integer, Pair> pairs = new HashMap<Integer, Pair>();
@@ -75,19 +75,15 @@ public class App extends Base {
     //fuck
     
     public static void main(String[] args) throws Exception {
-        if (args.length > 0 && args[0].equals("debug")) {
-            debug = true;
-        } else {
-            debug = false;
-        }
-        out = new Out("outputs\\output.txt");
-        PrintWriter outPOs = new PrintWriter("outputs\\POs.csv");
-        PrintWriter outQuotes = new PrintWriter("outputs\\Quotes.csv");
+        options(args);
+        out = new Out(outputsfolder + "output.txt");
+        PrintWriter outPOs = new PrintWriter(outputsfolder + "POs.csv");
+        PrintWriter outQuotes = new PrintWriter(outputsfolder + "Quotes.csv");
         outPOs.println("PO #,Date,Vendor,Description,Qty,Rate,Job,Amount,Total,Memo,Payment Terms,Quotes?");
         outQuotes.println("Vendor Name,Quote Number,PO Number,Ship Date,Qty,Qty Unit,Description,Unit Price,\"UoM\",Ext Price,S&H,Tax,Total");
         /*
         ArrayList<String> matchListt = new ArrayList<String>();
-        Scanner scan = new Scanner(new File("inputs\\matches.txt"));
+        Scanner scan = new Scanner(new File(inputsfolder + "matches.txt"));
         while (scan.hasNextLine()) {
             matchListt.add(scan.nextLine());
         }
@@ -103,7 +99,7 @@ public class App extends Base {
             for (File aPDF : folder.listFiles()) {
                 out.println("Current file: \"" + aPDF.getName() + "\"");
                 out.println("Filepath: \"" + aPDF.getPath() + "\"");
-                if (match("PO_(\\d{4,})_from_Radiance_Solar_LLC_(\\d{5,})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
+                if (match("(\\d{4} )?PO_(\\d{4,})_from_Radiance_Solar_LLC_(\\d{5,})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                     out.println("Matches! Type is PO");
                     try {
                         po = t.readTables(aPDF);
@@ -118,7 +114,7 @@ public class App extends Base {
                     }
                 } else {
                     boolean a = true;
-                    if (match("S(\\d{7})-(\\d{4})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
+                    if (match("(\\d{4} )?S(\\d{7})-(\\d{4})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                         out.println("Matches! Type is AED");
                         try {
                             Quote quote = wsl.readTables(aPDF, 0);
@@ -129,7 +125,7 @@ public class App extends Base {
                             filesNotRead.add(aPDF.getPath());
                             out.println("File didn't parse correctly! Do this one manually.\nDebug: AED\n");
                         }
-                    } else if (match("S(\\d{7,})-(\\d{4})_(\\d{4,5})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
+                    } else if (match("(\\d{4} )?S(\\d{7,})-(\\d{4})_(\\d{4,5})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                         out.println("Matches! Type is World Electric");
                         try {
                             Quote quote = wsl.readTables(aPDF, 1);
@@ -140,7 +136,7 @@ public class App extends Base {
                             filesNotRead.add(aPDF.getPath());
                             out.println("File didn't parse correctly! Do this one manually.\nDebug: World Electric\n");
                         }
-                    } else if (match("Graybar Quotation.+?\\.pdf", (aPDF.getName()))) {
+                    } else if (match("(\\d{4} )?Graybar Quotation.+?\\.pdf", (aPDF.getName()))) {
                         out.println("Matches! Type is Graybar");
                         try {
                             Quote quote = wsl.readTables(aPDF, 2);
@@ -151,7 +147,7 @@ public class App extends Base {
                             filesNotRead.add(aPDF.getPath());
                             out.println("File didn't parse correctly! Do this one manually.\nDebug: Graybar\n");
                         }
-                    } else if (match("Quotation REG_(\\d{5})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
+                    } else if (match("(\\d{4} )?Quotation REG_(\\d{5})(?: ?\\(\\d+\\))?\\.pdf", (aPDF.getName()))) {
                         try {
                             Quote quote = wsl.readTables(aPDF, 3);
                             quotes.add(quote);
@@ -197,7 +193,7 @@ public class App extends Base {
         for (Quote quote : quoteList) {
             outQuotes.println(quote.toCSV());
         }
-        PrintWriter filesReadOut = new PrintWriter("outputs\\filesread.txt");
+        PrintWriter filesReadOut = new PrintWriter(outputsfolder + "filesread.txt");
         out.println("FILES READ:");
         filesReadOut.println("FILES READ:");
         for (String str : filesRead) {
